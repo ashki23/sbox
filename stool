@@ -1,0 +1,166 @@
+#!/usr/bin/python3
+
+import argparse
+import sys
+import os
+
+parser = argparse.ArgumentParser(description = 'Toolkit for slurm and lfs', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
+parser.add_argument('-v', '--version', action = 'version', version = '%(prog)s 1.0')
+parser.add_argument('-a','--account', action = 'store_true', help = 'show slurm accounts')
+parser.add_argument('-g','--group', action = 'store_true', help = 'show posix groups')
+parser.add_argument('-f','--fairshare', action = 'store_true', help = 'show fairshare')
+parser.add_argument('-p','--partition', action = 'store_true', help = 'show partitions')
+parser.add_argument('-c','--cpu', action = 'store_true', help = 'show computational resources')
+parser.add_argument('-q','--queue', action = 'store_true', help = 'show jobs in the queue')
+parser.add_argument('-j','--job', action = 'store_true', help = 'show jobs history')
+parser.add_argument('--quota', action = 'store_true', help = 'show quotas')
+parser.add_argument('--qos', action = 'store_true', help = 'show quality of services')
+parser.add_argument('--running', action = 'store_true', help = 'show running jobs')
+parser.add_argument('--pending', action = 'store_true', help = 'show pending jobs')
+parser.add_argument('--ncpu', action = 'store_true', help = 'show number of available cpus')
+parser.add_argument('--ngpu', action = 'store_true', help = 'show number of available gpus')
+#parser.add_argument('--ssh-agent', action = 'store_true', help = 'activate an ssh-agent')
+args = parser.parse_args()
+
+part_cpu = ['Interactive','BioCompute','Lewis','Serial','Dtn','hpc3','hpc4','hpc4rc','hpc5','hpc6','General','GPU']
+part_gpu = ['gpu3','gpu4']
+
+if args.queue:
+    print(' Jobs in the Queue '.center(90,'-'))
+    os.system("""
+    squeue -u $USER
+    echo \n
+    """)
+
+if args.job:
+    print(' Jobs History (last week) '.center(123,'-'))
+    os.system("""
+    sacct --user $USER --state bf,ca,cd,dl,f,nf,pr,s,to --allocations --format jobid%10,user%6,account%7,state%10,partition%9,qos%7,ncpus%5,nnodes%5,reqmem%5,submit,reserved,start,elapsed,end,nodelist%30,jobname%15 -S $(date --date='week ago' +"%Y-%m-%d")
+    echo
+    """)
+
+if args.running:
+    print(' Running Jobs '.center(123,'-'))
+    os.system("""
+    sacct --user $USER --state R --allocations --format jobid%10,user%6,account%7,state%10,partition%9,qos%7,ncpus%5,nnodes%5,reqmem%5,submit,reserved,start,elapsed,Timelimit,nodelist%30,jobname%15
+    """)
+
+if args.pending:
+    print(' Pending Jobs '.center(123,'-'))
+    os.system("""    
+    squeue --user $USER --states PENDING --sort S --format "%10i %6u %7a %10T %9P %7q %5C %5D %5m %20V %20S %30Y %10r %j"
+    """)
+
+if args.ncpu:
+    print(' Number of CPUs '.center(60,'-'))
+    for p in part_cpu:
+        idle = os.popen(f"""
+        sinfo --partition {p} --Node --format %C | cut --delimiter '/' --fields 2,4 | tr '/' ' ' | awk '{{ sum1 += $1; sum2 += $2 }} END {{ print sum1, sum2 }}'
+        """).read().strip().split()
+        if int(idle[1]) > 0:
+            print('Partition ',p,' has ',idle[0],' cpus available out of ',idle[1],' (',round((int(idle[0])/int(idle[1]))*100),'%)',sep='')
+    print()
+
+if args.ngpu:
+    print(' Number of GPUs '.center(60,'-'))
+    for g in part_gpu:
+        unavail = os.popen(f"""
+        sacct -X --allusers --format JobID,partition,Reqgres,stat,user | grep RUNNING | grep -i {g} | awk '{{ print $3 }}' | awk 'BEGIN{{ FS=":" }} {{ total+=$2 }} END{{ print total }}'
+        """).read().strip()
+        try:
+            unavail = int(unavail)
+        except ValueError:
+            unavail = 0
+        
+        total = os.popen(f"""
+        sinfo -p {g} -o %n,%G | grep -Po '(?<=:)\d' | awk '{{ sum1 += $1 }} END {{ print sum1 }}'
+        """).read().strip()
+        try:
+            total = int(total)
+        except ValueError:
+            total = 0
+        
+        avail = total - unavail
+        print('Partition ',g,' has ',avail,' gpus available out of ',total,' (',round((avail/total)*100),'%)',sep='')
+    print()
+
+if args.partition:
+    print(' Partitions '.center(90,'-'))
+    os.system("""
+    sinfo -s
+    echo \n
+    """)
+
+if args.cpu:
+    print(' CPU/Mem per Node '.center(60,'-'))
+    os.system("""
+    sjstat -c
+    echo \n
+    """)
+
+if args.qos:
+    print(' QOS '.center(90,'-'))
+    os.system("""
+    sacctmgr show assoc format=account%15,share%7,qos%56 user=$USER
+    echo "\n The following shows information about RCSS quality of services (QOS):\n"
+    sacctmgr show qos format=Name%16,MaxWall,MaxSubmit,GrpTRES%8,GrpJobs,MaxTRES,MaxTRESPU,MaxJobsPU,MaxSubmit
+    echo "\n Note that blank means there is no limit."
+    echo \n
+    """)
+
+if args.account:
+    print(' Accounts '.center(90,'-'))
+    os.system("""
+    sacctmgr show assoc -np user=$USER format=account | tr "|\n" " " && echo \n
+    echo \n
+    """)
+
+if args.fairshare:
+    print(' Fairshare '.center(90,'-'))
+    os.system("""
+    sshare -U
+    echo \n
+    """)
+
+if args.group:
+    print(' Groups '.center(90,'-'))
+    os.system("""
+    groups
+    echo \n
+    """)
+ 
+if args.quota:
+    print(' Home Storage '.center(90,'-'))
+    os.system("""
+    df -h /home/$USER
+    echo \n
+    """)
+    
+    print(' Data Storage '.center(90,'-'))
+    os.system("""
+    lfs quota -hg $USER /storage/hpc
+    echo \n
+    """)
+    
+    gpn = os.popen("""
+    echo $(groups | grep -Po "[A-Za-z0-9-]+-group")
+    """).read().strip().split()
+    
+    if len (gpn) > 0:
+        for g in gpn:
+            print(' Group Storages '.center(90,'-'))
+            gn = g.replace('-group','')
+            os.system(f"""
+            lfs quota -hg {g} /storage/hpc
+            echo \n
+
+            if [ -d /storage/htc/{gn} ]; then
+            df -h /storage/htc/{gn}
+            echo \n
+            fi
+            
+            if [ -d /gprs/{gn} ]; then
+            df -h /gprs/{gn}
+            echo \n
+            fi           
+            """)
