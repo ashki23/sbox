@@ -20,11 +20,19 @@ parser.add_argument('--running', action = 'store_true', help = 'show running job
 parser.add_argument('--ncpu', action = 'store_true', help = 'show number of available cpus')
 parser.add_argument('--ngpu', action = 'store_true', help = 'show number of available gpus')
 parser.add_argument('--gpu', action = 'store_true', help = 'show gpu resources')
+parser.add_argument('--license', action = 'store_true', help = 'show available licenses')
 #parser.add_argument('--ssh-agent', action = 'store_true', help = 'activate an ssh-agent')
 args = parser.parse_args()
 
 part_cpu = ['Interactive','BioCompute','Lewis','Serial','Dtn','hpc3','hpc4','hpc4rc','hpc5','hpc6','General','GPU']
 part_gpu = ['gpu3','gpu4']
+
+if args.license:
+    print(' Licenses '.center(60,'-'))
+    os.system("""
+    scontrol show licenses
+    echo \n
+    """)
 
 if args.gpu:
     print(' GPU resources '.center(60,'-'))

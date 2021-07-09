@@ -1,0 +1,17 @@
+#!/usr/bin/python3
+
+import os
+import argparse
+
+parser = argparse.ArgumentParser(description = 'An alias for using Interactive partition', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
+parser.add_argument('-n', '--ntasks', type = int, default = 1, help = 'number of tasks (cpus)')
+parser.add_argument('-t', '--time', type = int, choices = [1,2,3,4], default = 2, help = 'number of hours (up to 4)')
+parser.add_argument('-l', '--license', help = 'license')
+parser.add_argument('--mem', default = '2G', help = 'number of memory')
+args = parser.parse_args()
+
+if args.license:
+    os.system(f"srun --partition Interactive --qos interactive --ntasks {args.ntasks} --mem {args.mem} --time {args.time}:00:00 --license {args.license}:1 --pty /bin/bash")
+
+if not args.license:
+    os.system(f"srun --partition Interactive --qos interactive --ntasks {args.ntasks} --mem {args.mem} --time {args.time}:00:00 --pty /bin/bash")
