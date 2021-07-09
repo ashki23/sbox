@@ -1,10 +1,16 @@
 #!/usr/bin/python3
+# =============================================================================
+# Author: Ashkan Mirzaee
+# License: GPL-3.0
+# Date: 2021/07/09
+# Source: https://github.com/ashki23/stool
+# =============================================================================
 
 import argparse
 import sys
 import os
 
-parser = argparse.ArgumentParser(description = 'Toolkit for slurm and lfs', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
+parser = argparse.ArgumentParser(description = 'Small toolkit for Slurm admins', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
 parser.add_argument('-a','--account', action = 'store_true', help = 'show slurm accounts')
 parser.add_argument('-f','--fairshare', action = 'store_true', help = 'show fairshare')
 parser.add_argument('-g','--group', action = 'store_true', help = 'show posix groups')
