@@ -19,7 +19,7 @@ parser.add_argument('--qos', action = 'store_true', help = 'show quality of serv
 parser.add_argument('--running', action = 'store_true', help = 'show running jobs')
 parser.add_argument('--pending', action = 'store_true', help = 'show pending jobs')
 parser.add_argument('--top', action = 'store_true', help = 'show top users')
-parser.add_argument('user', nargs='?', default = 'unkown', help = 'user id')
+parser.add_argument('user', nargs = '?', default = 'unknown', help = 'user id')
 args = parser.parse_args()
 
 if args.reserve:
