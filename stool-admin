@@ -5,21 +5,21 @@ import sys
 import os
 
 parser = argparse.ArgumentParser(description = 'Toolkit for slurm and lfs', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
-parser.add_argument('-v', '--version', action = 'version', version = '%(prog)s 1.0')
 parser.add_argument('-a','--account', action = 'store_true', help = 'show slurm accounts')
-parser.add_argument('-g','--group', action = 'store_true', help = 'show posix groups')
 parser.add_argument('-f','--fairshare', action = 'store_true', help = 'show fairshare')
-parser.add_argument('-q','--queue', action = 'store_true', help = 'show jobs in the queue')
+parser.add_argument('-g','--group', action = 'store_true', help = 'show posix groups')
 parser.add_argument('-j','--job', action = 'store_true', help = 'show jobs history')
-parser.add_argument('-r','--reserve', action = 'store_true', help = 'show reservation')
+parser.add_argument('-q','--queue', action = 'store_true', help = 'show jobs in the queue')
+parser.add_argument('-v', '--version', action = 'version', version = '%(prog)s 1.0')
 parser.add_argument('--whodat', action = 'store_true', help = 'show users informations')
 parser.add_argument('--whodat2', action = 'store_true', help = 'show users informations by name')
 parser.add_argument('--quota', action = 'store_true', help = 'show quotas')
 parser.add_argument('--qos', action = 'store_true', help = 'show quality of services')
-parser.add_argument('--running', action = 'store_true', help = 'show running jobs')
 parser.add_argument('--pending', action = 'store_true', help = 'show pending jobs')
+parser.add_argument('--running', action = 'store_true', help = 'show running jobs')
+parser.add_argument('--reserve', action = 'store_true', help = 'show reservation')
 parser.add_argument('--top', action = 'store_true', help = 'show top users')
-parser.add_argument('user', nargs = '?', default = 'unknown', help = 'user id')
+parser.add_argument('user', nargs = '?', help = 'user id')
 args = parser.parse_args()
 
 if args.reserve:
