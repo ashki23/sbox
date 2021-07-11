@@ -10,10 +10,12 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser(description = 'Starting Jupyter server on the cluster', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56), epilog = 'Command should be run from the login node.')
-parser.add_argument('-n', '--ntasks', type = int, default = 1, help = 'number of tasks (cpus)', metavar='')
-parser.add_argument('-p', '--partition', default = 'Lewis', help = 'partition name', metavar='')
+parser.add_argument('-A', '--account', default = 'general', help = 'account name', metavar = '')
+parser.add_argument('-n', '--ntasks', type = int, default = 1, help = 'number of tasks (cpus)', metavar = '')
+parser.add_argument('-p', '--partition', default = 'Lewis', help = 'partition name', metavar = '')
 parser.add_argument('-t', '--time', type = int, choices = [1,2,3,4,5,6,7,8], default = 2, help = 'number of hours (up to 8)', metavar = '')
-parser.add_argument('--mem', default = '4G', help = 'number of memory', metavar='')
+parser.add_argument('--mem', default = '4G', help = 'number of memory', metavar = '')
+parser.add_argument('--gres', default = 'gpu:0', help = 'generic resources (gpus)', metavar = '')
 args = parser.parse_args()
 
 host_name = os.popen('hostname').read().strip()
@@ -26,9 +28,11 @@ if 'login' in host_name:
         jb.write(f"""#!/bin/bash
 
 #SBATCH --job-name jupyter
+#SBATCH --account {args.account}
 #SBATCH --partition {args.partition}
 #SBATCH --ntasks {args.ntasks}
 #SBATCH --mem {args.mem}
+#SBATCH --gres {args.gres}
 #SBATCH --time {args.time}:00:00
 #SBATCH --output /home/{user_name}/.jupyter/job/%j.out
 

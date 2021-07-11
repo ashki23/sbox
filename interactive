@@ -10,6 +10,7 @@ import os
 import argparse
 
 parser = argparse.ArgumentParser(description = 'An alias for using Interactive partition', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56), epilog = 'Command should be run from the login node.')
+parser.add_argument('-A', '--account', default = 'general', help = 'account name', metavar = '')
 parser.add_argument('-n', '--ntasks', type = int, default = 1, help = 'number of tasks (cpus)', metavar = '')
 parser.add_argument('-t', '--time', type = int, choices = [1,2,3,4], default = 2, help = 'number of hours (up to 4)', metavar = '')
 parser.add_argument('-l', '--license', help = 'license', metavar = '')
@@ -20,10 +21,10 @@ host_name = os.popen('hostname').read().strip()
 
 if 'login' in host_name:
     if args.license:
-        os.system(f"srun --partition Interactive --qos interactive --ntasks {args.ntasks} --mem {args.mem} --time {args.time}:00:00 --license {args.license}:1 --pty /bin/bash")
+        os.system(f"srun --partition Interactive --qos interactive --ntasks {args.ntasks} --mem {args.mem} --time {args.time}:00:00 --account {args.account} --license {args.license}:1 --pty /bin/bash")
     
     if not args.license:
-        os.system(f"srun --partition Interactive --qos interactive --ntasks {args.ntasks} --mem {args.mem} --time {args.time}:00:00 --pty /bin/bash")
+        os.system(f"srun --partition Interactive --qos interactive --ntasks {args.ntasks} --mem {args.mem} --time {args.time}:00:00 --account {args.account} --pty /bin/bash")
 
 else:
     print('Command should be run from the login node')
