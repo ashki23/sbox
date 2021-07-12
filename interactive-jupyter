@@ -34,7 +34,7 @@ if 'login' in host_name:
 #SBATCH --mem {args.mem}
 #SBATCH --gres {args.gres}
 #SBATCH --time {args.time}:00:00
-#SBATCH --output /home/{user_name}/.jupyter/job/%j.out
+#SBATCH --output /home/{user_name}/.jupyter/job/py-%j.out
 
 module load anaconda
 jupyter-lab --no-browser --ip 0.0.0.0
@@ -42,24 +42,24 @@ jupyter-lab --no-browser --ip 0.0.0.0
     
     os.system(f"""
 cd /home/{user_name}/
-rm -f /home/{user_name}/.jupyter/job/*.out
+rm -f /home/{user_name}/.jupyter/job/py-*.out
 jid=$(sbatch --parsable /home/{user_name}/.jupyter/job/jupyter-job)
 echo "Starting Jupyter server (it might take about a couple minutes) ..."
-while [ ! -s /home/{user_name}/.jupyter/job/$jid.out ]; do
-echo "Starting Jupyter server ..."
+while ! grep -iq 'use control-c' /home/{user_name}/.jupyter/job/py-$jid.out > /dev/null 2>&1; do
 sleep 10
+echo "Starting Jupyter server ..."
 done
 unset jid
-cd -
+cd - > /dev/null 2>&1
     """)
 
-    jid = os.popen("ls -t /home/%s/.jupyter/job/*.out | head -n 1 | grep -Po '(?<=job/).*(?=.out)'" % user_name).read().strip()
-    port = os.popen("cat /home/%s/.jupyter/job/%s.out | grep '\[.*\].http://' | grep -Po '(?<=http://).*' | grep -Po '(?<=:)\d{4}(?=/?)'" % (user_name,jid)).read().strip()
-    host = os.popen(f"cat /home/{user_name}/.jupyter/job/{jid}.out | grep '\[.*\].http://' | grep -Po '(?<=http://).*' | grep -Po '.*(?=:)'").read().strip()
-    url = os.popen(f"cat /home/{user_name}/.jupyter/job/{jid}.out | grep '\[.*\].*or.*http://' | grep -Po '(?<=or ).*'").read().strip()
+    jid = os.popen("ls -t /home/%s/.jupyter/job/py-*.out | head -n 1 | grep -Po '(?<=job/py-).*(?=.out)'" % user_name).read().strip()
+    port = os.popen("cat /home/%s/.jupyter/job/py-%s.out | grep '\[.*\].http://' | grep -Po '(?<=http://).*' | grep -Po '(?<=:)\d{4}(?=/?)'" % (user_name,jid)).read().strip()
+    host = os.popen(f"cat /home/{user_name}/.jupyter/job/py-{jid}.out | grep '\[.*\].http://' | grep -Po '(?<=http://).*' | grep -Po '.*(?=:)'").read().strip()
+    url = os.popen(f"cat /home/{user_name}/.jupyter/job/py-{jid}.out | grep '\[.*\].*or.*http://' | grep -Po '(?<=or ).*'").read().strip()
     
     print(f"""
-Jupyter Notebook is running\n
+Jupyter Notebook is running.\n
 Open a new terminal in your local computer and run:
 ssh -NL {port}:{host}:{port} {user_name}@lewis.rnet.missouri.edu
 
