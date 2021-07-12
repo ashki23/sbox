@@ -16,9 +16,9 @@ parser.add_argument('-a','--account', action = 'store_true', help = 'show slurm 
 parser.add_argument('-c','--cpu', action = 'store_true', help = 'show computational resources')
 parser.add_argument('-f','--fairshare', action = 'store_true', help = 'show fairshare')
 parser.add_argument('-g','--group', action = 'store_true', help = 'show posix groups')
-parser.add_argument('-j','--job', action = 'store_true', help = 'show jobs history')
 parser.add_argument('-p','--partition', action = 'store_true', help = 'show partitions')
 parser.add_argument('-q','--queue', action = 'store_true', help = 'show jobs in the queue')
+parser.add_argument('-j','--job', choices = ['day','week','month','year'], help = 'show jobs history for last day/week/month/year', metavar = '')
 parser.add_argument('--quota', action = 'store_true', help = 'show quotas')
 parser.add_argument('--qos', action = 'store_true', help = 'show quality of services')
 parser.add_argument('--pending', action = 'store_true', help = 'show pending jobs')
@@ -33,14 +33,14 @@ part_cpu = ['Interactive','BioCompute','Lewis','Serial','Dtn','hpc3','hpc4','hpc
 part_gpu = ['gpu3','gpu4']
 
 if args.license:
-    print(' Licenses '.center(60,'-'))
+    print(' Licenses '.center(90,'-'))
     os.system("""
     scontrol show licenses
     echo \n
     """)
 
 if args.gpu:
-    print(' GPU resources '.center(60,'-'))
+    print(' GPU resources '.center(90,'-'))
     os.system("""
     sinfo -p Gpu -o %n,%G
     echo \n
@@ -54,26 +54,26 @@ if args.queue:
     """)
 
 if args.job:
-    print(' Jobs History (last week) '.center(123,'-'))
-    os.system("""
-    sacct --user $USER --state bf,ca,cd,dl,f,nf,pr,s,to --allocations --format jobid%10,user%6,account%7,state%10,partition%9,qos%7,ncpus%5,nnodes%5,reqmem%5,submit,reserved,start,elapsed,end,nodelist%30,jobname%15 -S $(date --date='week ago' +"%Y-%m-%d")
+    print(f" Jobs History - Last {args.job.capitalize()} ".center(123,'-'))
+    os.system(f"""
+    sacct --user $USER --state bf,ca,cd,dl,f,nf,pr,s,to --allocations --format jobid%10,user%6,account%7,state%10,partition%9,qos%7,ncpus%5,nnodes%5,reqmem%5,submit,reserved,start,elapsed,end,nodelist%30,jobname%15 -S $(date --date='{args.job} ago' +"%Y-%m-%d")
     echo
     """)
 
 if args.running:
-    print(' Running Jobs '.center(123,'-'))
+    print(' Running Jobs '.center(90,'-'))
     os.system("""
     sacct --user $USER --state R --allocations --format jobid%10,user%6,account%7,state%10,partition%9,qos%7,ncpus%5,nnodes%5,reqmem%5,submit,reserved,start,elapsed,Timelimit,nodelist%30,jobname%15
     """)
 
 if args.pending:
-    print(' Pending Jobs '.center(123,'-'))
+    print(' Pending Jobs '.center(90,'-'))
     os.system("""    
     squeue --user $USER --states PENDING --sort S --format "%10i %6u %7a %10T %9P %7q %5C %5D %5m %20V %20S %30Y %10r %j"
     """)
 
 if args.ncpu:
-    print(' Number of CPUs '.center(60,'-'))
+    print(' Number of CPUs '.center(90,'-'))
     for p in part_cpu:
         idle = os.popen(f"""
         sinfo --partition {p} --Node --format %C | cut --delimiter '/' --fields 2,4 | tr '/' ' ' | awk '{{ sum1 += $1; sum2 += $2 }} END {{ print sum1, sum2 }}'
@@ -83,7 +83,7 @@ if args.ncpu:
     print()
 
 if args.ngpu:
-    print(' Number of GPUs '.center(60,'-'))
+    print(' Number of GPUs '.center(90,'-'))
     for g in part_gpu:
         unavail = os.popen(f"""
         sacct -X --allusers --format JobID,partition,Reqgres,stat,user | grep RUNNING | grep -i {g} | awk '{{ print $3 }}' | awk 'BEGIN{{ FS=":" }} {{ total+=$2 }} END{{ print total }}'
@@ -113,7 +113,7 @@ if args.partition:
     """)
 
 if args.cpu:
-    print(' CPU/Mem per Node '.center(60,'-'))
+    print(' CPU/Mem per Node '.center(90,'-'))
     os.system("""
     sjstat -c
     echo \n
