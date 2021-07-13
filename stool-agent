@@ -46,7 +46,7 @@ if args.k:
     if bool(os.popen('if ps -elf | grep ssh-agent | grep -v grep | grep -q $USER; then echo True; fi').read()):
         os.system(f"""
 echo "Stopping the current agent on {host_name} ..."
-eval `ssh-agent -k`
+kill `ps -elf | grep ssh-agent | grep -v grep | grep $USER | awk '{{print $4}}'`
 rm -f /home/{user_name}/.ssh_auth/{host_name}
             """)
     else:
