@@ -29,6 +29,10 @@ parser.add_argument('--gpu', action = 'store_true', help = 'show gpu resources')
 parser.add_argument('--license', action = 'store_true', help = 'show available licenses')
 args = parser.parse_args()
 
+if len(sys.argv) == 1:
+    parser.print_help(sys.stderr)
+    sys.exit(1)
+
 part_cpu = ['Interactive','BioCompute','Lewis','Serial','Dtn','hpc3','hpc4','hpc4rc','hpc5','hpc6','General','Gpu']
 part_gpu = ['gpu3','gpu4']
 
