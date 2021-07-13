@@ -1,0 +1,53 @@
+#!/usr/bin/python3
+# =============================================================================
+# Author: Ashkan Mirzaee
+# License: GPL-3.0
+# Date: 2021/07/13
+# Source: https://github.com/ashki23/stool
+# =============================================================================
+
+import os
+import sys
+import argparse
+
+parser = argparse.ArgumentParser(description = 'Running and stopping an ssh-agent on a host')
+parser.add_argument('-s', action = 'store_true', help = 'start an agent on a the current host')
+parser.add_argument('-k', action = 'store_true', help = 'Kill the current agent on a host')
+args = parser.parse_args()
+
+if len(sys.argv) == 1:
+    parser.print_help(sys.stderr)
+    sys.exit(1)
+
+host_name = os.popen('hostname').read().strip()
+user_name = os.getenv('USER')
+
+if args.s:
+    if bool(os.popen('if [ -f ~/.ssh/id_rsa ]; then echo True; fi').read().strip()):
+        if not bool(os.popen('if ps -elf | grep ssh-agent | grep -v grep | grep -q $USER; then echo True; fi').read()):
+            os.system(f"""
+echo "Starting an agent on {host_name} ..."
+install -d /home/{user_name}/.ssh_auth
+eval `ssh-agent -s`
+ssh-add
+echo $SSH_AUTH_SOCK > /home/{user_name}/.ssh_auth/{host_name}
+            """)
+        else:
+            os.system(f"""
+if [ -z $SSH_AUTH_SOCK ]; then
+export SSH_AUTH_SOCK=`cat /home/{user_name}/.ssh_auth/{host_name}`
+fi
+echo "The ssh-agent is running on {host_name}."
+            """)
+    else:
+        print('SSH keys not found. Add your id_rsa keys to "~/.ssh".')
+
+if args.k:
+    if bool(os.popen('if ps -elf | grep ssh-agent | grep -v grep | grep -q $USER; then echo True; fi').read()):
+        os.system(f"""
+echo "Stopping the current agent on {host_name} ..."
+eval `ssh-agent -k`
+rm -f /home/{user_name}/.ssh_auth/{host_name}
+            """)
+    else:
+        print(f"Not a running agent found on {host_name}.")
