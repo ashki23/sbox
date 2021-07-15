@@ -16,7 +16,7 @@ parser.add_argument('-n', '--ntasks', type = int, default = 1, help = 'number of
 parser.add_argument('-p', '--partition', choices = ['Lewis','BioCompute','hpc4','hpc5','hpc6','Gpu','gpu3','gpu4'], default = 'Lewis', help = 'partition name', metavar = '')
 parser.add_argument('-t', '--time', type = int, choices = [1,2,3,4,5,6,7,8], default = 2, help = 'number of hours (up to 8)', metavar = '')
 parser.add_argument('-R', action = 'store_true', help = 'using R kernel')
-parser.add_argument('--mem', default = '4G', help = 'number of memory', metavar = '')
+parser.add_argument('--mem', type = int, default = 4, help = 'amount of memory (GB)', metavar = '')
 parser.add_argument('--gres', default = 'gpu:0', help = 'generic resources (gpus)', metavar = '')
 args = parser.parse_args()
 
@@ -44,7 +44,7 @@ if 'login' in host_name:
 #SBATCH --account {args.account}
 #SBATCH --partition {args.partition}
 #SBATCH --ntasks {args.ntasks}
-#SBATCH --mem {args.mem}
+#SBATCH --mem {args.mem}G
 #SBATCH --gres {args.gres}
 #SBATCH --time {args.time}:00:00
 #SBATCH --output /home/{user_name}/.jupyter/job/{kernel}-%j.out
@@ -57,6 +57,7 @@ jupyter-lab --no-browser --ip 0.0.0.0
 cd /home/{user_name}/
 rm -f /home/{user_name}/.jupyter/job/{kernel}-*.out
 jid=$(sbatch --parsable /home/{user_name}/.jupyter/job/{kernel}-jupyter-job)
+echo "Logging into {args.partition} partition with {args.mem}G memory, {args.ntasks} cpu and using account {args.account} for {args.time} hours ..."
 echo "Starting Jupyter server (it might take about a couple minutes) ..."
 myn=0
 while ! grep -iq 'use control-c' /home/{user_name}/.jupyter/job/{kernel}-$jid.out > /dev/null 2>&1; do
