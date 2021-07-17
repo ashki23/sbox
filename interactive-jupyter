@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 # =============================================================================
 # Author: Ashkan Mirzaee
+# Organization: University of Missouri RCSS 
 # License: GPL-3.0
 # Date: 2021/07/09
 # Source: https://github.com/ashki23/stool
@@ -10,7 +11,7 @@ import os
 import sys
 import argparse
 
-parser = argparse.ArgumentParser(description = 'Starting Jupyter server on the cluster', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56), epilog = 'Command should be run from the login node.')
+parser = argparse.ArgumentParser(description = 'Starting Jupyter server on the cluster', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
 parser.add_argument('-A', '--account', default = 'general', help = 'account name', metavar = '')
 parser.add_argument('-n', '--ntasks', type = int, default = 1, help = 'number of tasks (cpus)', metavar = '')
 parser.add_argument('-p', '--partition', choices = ['Lewis','BioCompute','hpc4','hpc5','hpc6','Gpu','gpu3','gpu4'], default = 'Lewis', help = 'partition name', metavar = '')
@@ -20,9 +21,25 @@ parser.add_argument('--mem', type = int, default = 4, help = 'amount of memory (
 parser.add_argument('--gres', default = 'gpu:0', help = 'generic resources (gpus)', metavar = '')
 args = parser.parse_args()
 
+if args.account == 'general' and args.partition in ['BioCompute','gpu3','gpu4','hpc6']:
+    print('General account not allowed to use partitions BioCompute, gpu3, gpu4, and hpc6. Use another account or change the partiton.')
+    sys.exit(1)
+
 if args.partition == 'Gpu' and args.time > 2:
     print('Partition time limit. Max time for Gpu partition is 2 hours.')
     sys.exit(1)
+
+if args.partition not in ['Gpu','gpu3','gpu4'] and args.gres != 'gpu:0':
+    print('For using gpu respurces select one of gpu partitions (Gpu, gpu3, gpu4).')
+    sys.exit(1)
+
+if args.partition in ['Gpu','gpu3','gpu4'] and args.gres == 'gpu:0':
+    args.gres = 'gpu:1'
+
+if args.partition in ['Gpu','gpu3','gpu4']:
+    announce = f"Logging into {args.partition} partition with {args.gres.split(':')[1]} gpu, {args.mem}G memory, {args.ntasks} cpu and using account {args.account} for {args.time} hours ..."
+else:
+    announce = f"Logging into {args.partition} partition with {args.mem}G memory, {args.ntasks} cpu and using account {args.account} for {args.time} hours ..."
 
 if args.R:
     kernel = 'r'
@@ -31,14 +48,10 @@ else:
     kernel = 'py'
     module = 'anaconda'
 
-host_name = os.popen('hostname').read().strip()
-
-if 'login' in host_name:
-    user_name = os.getenv('USER')
-    os.system(f"install -d /home/{user_name}/.jupyter/job")
-    
-    with open(f"/home/{user_name}/.jupyter/job/{kernel}-jupyter-job",'w') as jb:
-        jb.write(f"""#!/bin/bash
+user = os.getenv('USER')
+os.system(f"install -d /home/{user}/.jupyter/job")
+with open(f"/home/{user}/.jupyter/job/{kernel}-jupyter-job",'w') as jb:
+    jb.write(f"""#!/bin/bash
 
 #SBATCH --job-name jupyter-{kernel}
 #SBATCH --account {args.account}
@@ -47,21 +60,22 @@ if 'login' in host_name:
 #SBATCH --mem {args.mem}G
 #SBATCH --gres {args.gres}
 #SBATCH --time {args.time}:00:00
-#SBATCH --output /home/{user_name}/.jupyter/job/{kernel}-%j.out
+#SBATCH --output /home/{user}/.jupyter/job/{kernel}-%j.out
 
 module load {module}
 jupyter-lab --no-browser --ip 0.0.0.0
-        """)
+    """)
     
-    os.system(f"""
-cd /home/{user_name}/
-rm -f /home/{user_name}/.jupyter/job/{kernel}-*.out
-jid=$(sbatch --parsable /home/{user_name}/.jupyter/job/{kernel}-jupyter-job)
-echo "Logging into {args.partition} partition with {args.mem}G memory, {args.ntasks} cpu and using account {args.account} for {args.time} hours ..."
+os.system(f"""
+cd /home/{user}/
+rm -f /home/{user}/.jupyter/job/{kernel}-*.out
+jid=$(sbatch --parsable /home/{user}/.jupyter/job/{kernel}-jupyter-job)
+echo {announce}
 echo "Starting Jupyter server (it might take about a couple minutes) ..."
 myn=0
-while ! grep -iq 'use control-c' /home/{user_name}/.jupyter/job/{kernel}-$jid.out > /dev/null 2>&1; do
+while ! grep -iq 'use control-c' /home/{user}/.jupyter/job/{kernel}-$jid.out > /dev/null 2>&1; do
 sleep 10
+if squeue -j $jid | grep -q AccountNotAllowed; then echo "{args.account} account not allowed to use {args.partition}. Use another account or change the partition"; exit; fi 
 echo "Starting Jupyter server ..."
 myn=`expr $myn + 1`
 if [ $myn -eq 15 ]; then
@@ -78,26 +92,23 @@ fi
 done
 unset jid myn i
 cd - > /dev/null 2>&1
-    """)
+""")
 
-    jid = os.popen("ls -t /home/%s/.jupyter/job/%s-*.out 2> /dev/null | head -n 1 | grep -Po '(?<=job/%s-).*(?=.out)'" % (user_name,kernel,kernel)).read().strip()
-    port = os.popen("cat /home/%s/.jupyter/job/%s-%s.out 2> /dev/null | grep '\[.*\].http://' | grep -Po '(?<=http://).*' | grep -Po '(?<=:)\d{4}(?=/?)'" % (user_name,kernel,jid)).read().strip()
-    host = os.popen(f"cat /home/{user_name}/.jupyter/job/{kernel}-{jid}.out 2> /dev/null | grep '\[.*\].http://' | grep -Po '(?<=http://).*' | grep -Po '.*(?=:)'").read().strip()
-    url = os.popen(f"cat /home/{user_name}/.jupyter/job/{kernel}-{jid}.out 2> /dev/null | grep '\[.*\].*or.*http://' | grep -Po '(?<=or ).*'").read().strip()
+jid = os.popen("ls -t /home/%s/.jupyter/job/%s-*.out 2> /dev/null | head -n 1 | grep -Po '(?<=job/%s-).*(?=.out)'" % (user,kernel,kernel)).read().strip()
+port = os.popen("cat /home/%s/.jupyter/job/%s-%s.out 2> /dev/null | grep '\[.*\].http://' | grep -Po '(?<=http://).*' | grep -Po '(?<=:)\d{4}(?=/?)'" % (user,kernel,jid)).read().strip()
+host = os.popen(f"cat /home/{user}/.jupyter/job/{kernel}-{jid}.out 2> /dev/null | grep '\[.*\].http://' | grep -Po '(?<=http://).*' | grep -Po '.*(?=:)'").read().strip()
+url = os.popen(f"cat /home/{user}/.jupyter/job/{kernel}-{jid}.out 2> /dev/null | grep '\[.*\].*or.*http://' | grep -Po '(?<=or ).*'").read().strip()
     
-    if len(jid) > 0:
-        print(f"""
+if len(jid) > 0:
+    print(f"""
 Jupyter Notebook is running.
 
 Open a new terminal in your local computer and run:
-ssh -NL {port}:{host}:{port} {user_name}@lewis.rnet.missouri.edu
+ssh -NL {port}:{host}:{port} {user}@lewis.rnet.missouri.edu
 
 After that open a browser and go:
 {url}
 
 To stop the server run the following on the cluster:
 scancel {jid}
-        """)
-
-else:
-    print('Command should be run from the login node.')
+    """)
