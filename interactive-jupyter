@@ -85,7 +85,7 @@ The following shows the status of your job in the queue:
 "
 squeue -j $jid
 echo "
-You can wait more if your job is waiting for resources (Priority) or cancel the job and try again.
+You can wait more if your job is waiting for resources (Priority or Resources) or cancel the job and try again.
 To Cancel your job press 'Control+C' and run 'scancel $jid'.
 "
 fi
