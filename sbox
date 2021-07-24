@@ -11,17 +11,19 @@ import argparse
 import sys
 import os
 
-parser = argparse.ArgumentParser(description = 'Small toolkit for Slurm users', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
+parser = argparse.ArgumentParser(description = 'Small toolbox for Slurm users', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
 parser.add_argument('-v', '--version', action = 'version', version = '%(prog)s 1.0')
-parser.add_argument('-a','--account', action = 'store_true', help = 'show slurm accounts')
-parser.add_argument('-c','--cpu', action = 'store_true', help = 'show computational resources')
-parser.add_argument('-f','--fairshare', action = 'store_true', help = 'show fairshare')
-parser.add_argument('-g','--group', action = 'store_true', help = 'show posix groups')
-parser.add_argument('-p','--partition', action = 'store_true', help = 'show partitions')
-parser.add_argument('-q','--queue', action = 'store_true', help = 'show jobs in the queue')
-parser.add_argument('-j','--job', choices = ['day','week','month','year'], help = 'show jobs history for last day/week/month/year', metavar = '')
+parser.add_argument('-a', '--account', action = 'store_true', help = 'show slurm accounts')
+parser.add_argument('-c', '--cpu', action = 'store_true', help = 'show computational resources')
+parser.add_argument('-f', '--fairshare', action = 'store_true', help = 'show fairshare')
+parser.add_argument('-g', '--group', action = 'store_true', help = 'show posix groups')
+parser.add_argument('-p', '--partition', action = 'store_true', help = 'show partitions')
+parser.add_argument('-q', '--queue', action = 'store_true', help = 'show jobs in the queue')
+parser.add_argument('-j', '--job', type = int, help = 'show a running/pending job info')
+parser.add_argument('--eff', type = int, help = 'show efficiency of a job', metavar = '')
 parser.add_argument('--quota', action = 'store_true', help = 'show quotas')
 parser.add_argument('--qos', action = 'store_true', help = 'show quality of services')
+parser.add_argument('--history', choices = ['day','week','month','year'], help = 'show jobs history for last day/week/month/year', metavar = '')
 parser.add_argument('--pending', action = 'store_true', help = 'show pending jobs')
 parser.add_argument('--running', action = 'store_true', help = 'show running jobs')
 parser.add_argument('--ncpu', action = 'store_true', help = 'show number of available cpus')
@@ -37,6 +39,42 @@ if len(sys.argv) == 1:
 
 part_cpu = ['Interactive','BioCompute','Lewis','Serial','Dtn','hpc3','hpc4','hpc4rc','hpc5','hpc6','General','Gpu']
 part_gpu = ['gpu3','gpu4']
+
+if args.eff:
+    print(' Job Efficiency '.center(90,'-'))
+    os.system(f"""
+    install -d ~/.seff
+    rm -f ~/.seff/seff.out
+    if sacct -Xj {args.eff} | grep -iq "COMPLETED"; then
+    seff {args.eff}
+    else
+    cat > ~/.seff/seff-job.sh <<EOF
+#!/bin/bash
+#SBATCH --jobid {args.eff}
+top -u $USER -b -n 1 > ~/.seff/seff.out
+EOF
+    sleep 0.1
+    if squeue -j {args.eff} | grep -q '0:00'; then
+    echo 'Job is not running. Retry when the job is started!'
+    exit
+    fi
+    srun --jobid {args.eff} /bin/bash ~/.seff/seff-job.sh
+    while [ ! -f ~/.seff/seff.out ]; do
+    sleep 0.5
+    done
+    cat ~/.seff/seff.out | grep -P "$USER|PID" | grep -v top | grep -v slurm_scri
+    echo
+    echo 'RES: shows resident memory which is accurate representation of how much actual physical memory a process is consuming'
+    echo '%CPU: shows the percentage of the CPU that is being used by the process'
+    fi
+    echo \n
+    """)
+
+if args.job:
+    print(' Job Info '.center(90,'-'))
+    os.system(f"""
+    scontrol -dd show job {args.job}
+    """)
 
 if args.license:
     print(' Licenses '.center(90,'-'))
@@ -59,10 +97,10 @@ if args.queue:
     echo \n
     """)
 
-if args.job:
-    print(f" Jobs History - Last {args.job.capitalize()} ".center(123,'-'))
+if args.history:
+    print(f" Jobs History - Last {args.history.capitalize()} ".center(123,'-'))
     os.system(f"""
-    sacct --user $USER --state bf,ca,cd,dl,f,nf,pr,s,to --allocations --format jobid%10,user%6,account%7,state%10,partition%9,qos%7,ncpus%5,nnodes%5,reqmem%5,submit,reserved,start,elapsed,end,nodelist%30,jobname%15 -S $(date --date='{args.job} ago' +"%Y-%m-%d")
+    sacct --user $USER --state bf,ca,cd,dl,f,nf,pr,s,to --allocations --format jobid%10,user%6,account%7,state%10,partition%9,qos%7,ncpus%5,nnodes%5,reqmem%5,submit,reserved,start,elapsed,end,nodelist%30,jobname%15 -S $(date --date='{args.history} ago' +"%Y-%m-%d")
     echo
     """)
 

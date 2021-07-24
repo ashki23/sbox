@@ -11,18 +11,18 @@ import argparse
 import sys
 import os
 
-parser = argparse.ArgumentParser(description = 'Small toolkit for Slurm admins', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
+parser = argparse.ArgumentParser(description = 'Small toolbox for Slurm admins', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
 parser.add_argument('-v', '--version', action = 'version', version = '%(prog)s 1.0')
-parser.add_argument('-a','--account', action = 'store_true', help = 'show slurm accounts')
-parser.add_argument('-f','--fairshare', action = 'store_true', help = 'show fairshare')
-parser.add_argument('-g','--group', action = 'store_true', help = 'show posix groups')
-parser.add_argument('-q','--queue', action = 'store_true', help = 'show jobs in the queue')
-parser.add_argument('-j','--job', choices = ['day','week','month','year'], help = 'show jobs history for last day/week/month/year', metavar = '')
+parser.add_argument('-a', '--account', action = 'store_true', help = 'show slurm accounts')
+parser.add_argument('-f', '--fairshare', action = 'store_true', help = 'show fairshare')
+parser.add_argument('-g', '--group', action = 'store_true', help = 'show posix groups')
+parser.add_argument('-q', '--queue', action = 'store_true', help = 'show jobs in the queue')
+parser.add_argument('-j', '--job', type = int, help = 'show a running/pending job info')
 parser.add_argument('--whodat', action = 'store_true', help = 'show users informations by uid')
 parser.add_argument('--whodat2', action = 'store_true', help = 'show users informations by name')
-parser.add_argument('--showjob', action = 'store_true', help = 'show a running/pending job info')
 parser.add_argument('--quota', action = 'store_true', help = 'show quotas')
 parser.add_argument('--qos', action = 'store_true', help = 'show quality of services')
+parser.add_argument('--history', choices = ['day','week','month','year'], help = 'show jobs history for last day/week/month/year', metavar = '')
 parser.add_argument('--pending', action = 'store_true', help = 'show pending jobs')
 parser.add_argument('--running', action = 'store_true', help = 'show running jobs')
 parser.add_argument('--reserve', action = 'store_true', help = 'show reservation')
@@ -34,10 +34,10 @@ if len(sys.argv) == 1:
     parser.print_help(sys.stderr)
     sys.exit(1)
 
-if args.showjob:
-    print(' Show Job '.center(90,'-'))
+if args.job:
+    print(' Job Info '.center(90,'-'))
     os.system(f"""
-    scontrol -dd show job {args.user}
+    scontrol -dd show job {args.job}
     """)
 
 if args.reserve:
@@ -71,10 +71,10 @@ if args.queue:
     echo \n
     """)
 
-if args.job:
-    print(f" Jobs History - Last {args.job.capitalize()} ".center(90,'-'))
+if args.history:
+    print(f" Jobs History - Last {args.history.capitalize()} ".center(90,'-'))
     os.system(f"""
-    sacct --user {args.user} --state bf,ca,cd,dl,f,nf,pr,s,to --allocations --format jobid%10,user%6,account%7,state%10,partition%9,qos%7,ncpus%5,nnodes%5,reqmem%5,submit,reserved,start,elapsed,end,nodelist%30,jobname%15 -S $(date --date='{args.job} ago' +"%Y-%m-%d")
+    sacct --user {args.user} --state bf,ca,cd,dl,f,nf,pr,s,to --allocations --format jobid%10,user%6,account%7,state%10,partition%9,qos%7,ncpus%5,nnodes%5,reqmem%5,submit,reserved,start,elapsed,end,nodelist%30,jobname%15 -S $(date --date='{args.history} ago' +"%Y-%m-%d")
     echo
     """)
 
