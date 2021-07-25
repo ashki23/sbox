@@ -12,25 +12,29 @@ import sys
 import os
 
 parser = argparse.ArgumentParser(description = 'Small toolbox for Slurm users', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
-parser.add_argument('-v', '--version', action = 'version', version = '%(prog)s 1.0')
 parser.add_argument('-a', '--account', action = 'store_true', help = 'show slurm accounts')
-parser.add_argument('-c', '--cpu', action = 'store_true', help = 'show computational resources')
 parser.add_argument('-f', '--fairshare', action = 'store_true', help = 'show fairshare')
-parser.add_argument('-g', '--group', action = 'store_true', help = 'show posix groups')
-parser.add_argument('-p', '--partition', action = 'store_true', help = 'show partitions')
+parser.add_argument('-g', '--group', action = 'store_true',  help = 'show posix groups')
 parser.add_argument('-q', '--queue', action = 'store_true', help = 'show jobs in the queue')
-parser.add_argument('-j', '--job', type = int, help = 'show a running/pending job info')
+parser.add_argument('-j', '--job', type = int, help = 'show a running/pending job info', metavar = 'JOBID')
+parser.add_argument('-c', '--cpu', action = 'store_true', help = 'show computational resources')
+parser.add_argument('-p', '--partition', action = 'store_true', help = 'show partitions')
+parser.add_argument('-u', '--user', nargs = '?', default = '$USER', help = 'user id', metavar = 'UID')
 parser.add_argument('--eff', type = int, help = 'show efficiency of a job', metavar = '')
-parser.add_argument('--quota', action = 'store_true', help = 'show quotas')
-parser.add_argument('--qos', action = 'store_true', help = 'show quality of services')
-parser.add_argument('--history', choices = ['day','week','month','year'], help = 'show jobs history for last day/week/month/year', metavar = '')
+parser.add_argument('--history', choices = ['day','week','month','year'], help = 'show jobs history for last day/week/month/year')
 parser.add_argument('--pending', action = 'store_true', help = 'show pending jobs')
 parser.add_argument('--running', action = 'store_true', help = 'show running jobs')
+parser.add_argument('--qos', action = 'store_true', help = 'show quality of services')
 parser.add_argument('--ncpu', action = 'store_true', help = 'show number of available cpus')
 parser.add_argument('--ngpu', action = 'store_true', help = 'show number of available gpus')
 parser.add_argument('--gpu', action = 'store_true', help = 'show gpu resources')
 parser.add_argument('--license', action = 'store_true', help = 'show available licenses')
-parser.add_argument('--agent', choices = ['start','stop','list'], help = 'start/stop/list ssh-agents on the current host', metavar = '')
+parser.add_argument('--reserve', action = 'store_true', help = 'show reservation')
+parser.add_argument('--topusage', action = 'store_true', help = 'show top usage users')
+parser.add_argument('--quota', action = 'store_true', help = 'show quotas')
+parser.add_argument('--whodat', help = 'show users informations by uid', metavar = 'UID')
+parser.add_argument('--whodat2', help = 'show users informations by name', metavar = 'NAME')
+parser.add_argument('--agent', choices = ['start','stop','list'], help = 'start/stop/list ssh-agents on the current host')
 args = parser.parse_args()
 
 if len(sys.argv) == 1:
@@ -39,6 +43,55 @@ if len(sys.argv) == 1:
 
 part_cpu = ['Interactive','BioCompute','Lewis','Serial','Dtn','hpc3','hpc4','hpc4rc','hpc5','hpc6','General','Gpu']
 part_gpu = ['gpu3','gpu4']
+user = os.getenv('USER')
+
+if args.account:
+    print(' Accounts '.center(90,'-'))
+    os.system(f"""
+    sacctmgr show assoc -np user={args.user} format=account | tr "|\n" " " && echo \n
+    echo \n
+    """)
+
+if args.fairshare:
+    print(' Fairshare '.center(90,'-'))
+    os.system(f"""
+    sshare -Uu {args.user}
+    echo \n
+    """)
+
+if args.group:
+    print(' Groups '.center(90,'-'))
+    os.system(f"""
+    groups {args.user}
+    echo \n
+    """)
+
+if args.queue:
+    print(' Jobs in the Queue '.center(90,'-'))
+    os.system(f"""
+    squeue -u {args.user}
+    echo \n
+    """)
+
+if args.job:
+    print(' Job Info '.center(90,'-'))
+    os.system(f"""
+    scontrol -dd show job {args.job}
+    """)
+
+if args.cpu:
+    print(' CPU/Mem per Node '.center(90,'-'))
+    os.system("""
+    sjstat -c
+    echo \n
+    """)
+
+if args.partition:
+    print(' Partitions '.center(90,'-'))
+    os.system("""
+    sinfo -s
+    echo \n
+    """)
 
 if args.eff:
     print(' Job Efficiency '.center(90,'-'))
@@ -70,50 +123,33 @@ EOF
     echo \n
     """)
 
-if args.job:
-    print(' Job Info '.center(90,'-'))
-    os.system(f"""
-    scontrol -dd show job {args.job}
-    """)
-
-if args.license:
-    print(' Licenses '.center(90,'-'))
-    os.system("""
-    scontrol show licenses
-    echo \n
-    """)
-
-if args.gpu:
-    print(' GPU resources '.center(90,'-'))
-    os.system("""
-    sinfo -p Gpu -o %n,%G
-    echo \n
-    """)
-
-if args.queue:
-    print(' Jobs in the Queue '.center(90,'-'))
-    os.system("""
-    squeue -u $USER
-    echo \n
-    """)
-
 if args.history:
     print(f" Jobs History - Last {args.history.capitalize()} ".center(123,'-'))
     os.system(f"""
-    sacct --user $USER --state bf,ca,cd,dl,f,nf,pr,s,to --allocations --format jobid%10,user%6,account%7,state%10,partition%9,qos%7,ncpus%5,nnodes%5,reqmem%5,submit,reserved,start,elapsed,end,nodelist%30,jobname%15 -S $(date --date='{args.history} ago' +"%Y-%m-%d")
+    sacct --user {args.user} --state bf,ca,cd,dl,f,nf,pr,s,to --allocations --format jobid%10,user%6,account%7,state%10,partition%9,qos%7,ncpus%5,nnodes%5,reqmem%5,submit,reserved,start,elapsed,end,nodelist%30,jobname%15 -S $(date --date='{args.history} ago' +"%Y-%m-%d")
     echo
     """)
 
 if args.running:
     print(' Running Jobs '.center(90,'-'))
-    os.system("""
-    sacct --user $USER --state R --allocations --format jobid%10,user%6,account%7,state%10,partition%9,qos%7,ncpus%5,nnodes%5,reqmem%5,submit,reserved,start,elapsed,Timelimit,nodelist%30,jobname%15
+    os.system(f"""
+    sacct --user {args.user} --state R --allocations --format jobid%10,user%6,account%7,state%10,partition%9,qos%7,ncpus%5,nnodes%5,reqmem%5,submit,reserved,start,elapsed,Timelimit,nodelist%30,jobname%15
     """)
 
 if args.pending:
     print(' Pending Jobs '.center(90,'-'))
-    os.system("""    
-    squeue --user $USER --states PENDING --sort S --format "%10i %6u %7a %10T %9P %7q %5C %5D %5m %20V %20S %30Y %10r %j"
+    os.system(f"""
+    squeue --user {args.user} --states PENDING --sort S --format "%10i %6u %7a %10T %9P %7q %5C %5D %5m %20V %20S %30Y %10r %j"
+    """)
+
+if args.qos:
+    print(' QOS '.center(90,'-'))
+    os.system(f"""
+    sacctmgr show assoc format=account%15,share%7,qos%56 user={args.user}
+    echo "\n The following shows information about RCSS quality of services (QOS):\n"
+    sacctmgr show qos format=Name%16,MaxWall,MaxSubmit,GrpTRES%8,GrpJobs,MaxTRES,MaxTRESPU,MaxJobsPU,MaxSubmit
+    echo "\n Note that blank means there is no limit."
+    echo \n
     """)
 
 if args.ncpu:
@@ -149,86 +185,96 @@ if args.ngpu:
         print('Partition ',g,' has ',avail,' gpus available out of ',total,' (',round((avail/total)*100),'%)',sep='')
     print()
 
-if args.partition:
-    print(' Partitions '.center(90,'-'))
+if args.gpu:
+    print(' GPU Resources '.center(90,'-'))
     os.system("""
-    sinfo -s
+    sinfo -p Gpu -o %n,%G
     echo \n
     """)
 
-if args.cpu:
-    print(' CPU/Mem per Node '.center(90,'-'))
+if args.license:
+    print(' Licenses '.center(90,'-'))
     os.system("""
-    sjstat -c
+    scontrol show licenses
     echo \n
     """)
 
-if args.qos:
-    print(' QOS '.center(90,'-'))
+if args.reserve:
+    print(' Reservations '.center(90,'-'))
     os.system("""
-    sacctmgr show assoc format=account%15,share%7,qos%56 user=$USER
-    echo "\n The following shows information about RCSS quality of services (QOS):\n"
-    sacctmgr show qos format=Name%16,MaxWall,MaxSubmit,GrpTRES%8,GrpJobs,MaxTRES,MaxTRESPU,MaxJobsPU,MaxSubmit
-    echo "\n Note that blank means there is no limit."
-    echo \n
+    scontrol show reserv
     """)
 
-if args.account:
-    print(' Accounts '.center(90,'-'))
+if args.topusage:
+    print(' Top Usage '.center(90,'-'))
     os.system("""
-    sacctmgr show assoc -np user=$USER format=account | tr "|\n" " " && echo \n
-    echo \n
+    sreport user topusage
     """)
 
-if args.fairshare:
-    print(' Fairshare '.center(90,'-'))
-    os.system("""
-    sshare -U
-    echo \n
-    """)
-
-if args.group:
-    print(' Groups '.center(90,'-'))
-    os.system("""
-    groups
-    echo \n
-    """)
- 
 if args.quota:
-    print(' Home Storage '.center(90,'-'))
-    os.system("""
-    df -h /home/$USER
-    echo \n
-    """)
-    
-    print(' Data Storage '.center(90,'-'))
-    os.system("""
-    lfs quota -hg $USER /storage/hpc
-    echo \n
-    """)
-    
-    gpn = os.popen("""
-    echo $(groups | grep -Po "[A-Za-z0-9-]+-group")
-    """).read().strip().split()
-    
-    if len (gpn) > 0:
-        for g in gpn:
-            print(' Group Storages '.center(90,'-'))
-            gn = g.replace('-group','')
-            os.system(f"""
-            lfs quota -hg {g} /storage/hpc
-            echo \n
+    if args.user == user:
+        print(' Home Storage '.center(90,'-'))
+        os.system(f"""
+        df -h /home/{args.user}
+        echo \n
+        """)
+        
+        print(' Data Storage '.center(90,'-'))
+        os.system(f"""
+        lfs quota -hg {args.user} /storage/hpc
+        echo \n
+        """)
+        
+        gpn = os.popen("""
+        echo $(groups | grep -Po "[A-Za-z0-9-]+-group")
+        """).read().strip().split()
+        
+        if len (gpn) > 0:
+            for g in gpn:
+                print(' Group Storages '.center(90,'-'))
+                gn = g.replace('-group','')
+                os.system(f"""
+                lfs quota -hg {g} /storage/hpc
+                echo \n
+                
+                if [ -d /storage/htc/{gn} ]; then
+                df -h /storage/htc/{gn}
+                echo \n
+                fi
+                
+                if [ -d /gprs/{gn} ]; then
+                df -h /gprs/{gn}
+                echo \n
+                fi
+                """)
+    else:
+        print(' Home Storage '.center(90,'-'))
+        os.system(f"""
+        df -h /home/{args.user}
+        echo \n
+        """)
+        
+        gpn = os.popen(f"""
+        echo $(groups {args.user} | grep -Po "(?<=: ).*")
+        """).read().strip()
+        
+        print(' HPC Storage '.center(90,'-'))
+        os.system(f"""
+        rcss-lfs-quota {gpn[:]}
+        echo \n
+        """)
 
-            if [ -d /storage/htc/{gn} ]; then
-            df -h /storage/htc/{gn}
-            echo \n
-            fi
-            
-            if [ -d /gprs/{gn} ]; then
-            df -h /gprs/{gn}
-            echo \n
-            fi           
-            """)
+if args.whodat:
+    print(' User Info '.center(90,'-'))
+    os.system(f"""
+    ldapsearch -x -LLL "(uid=*{args.whodat}*)"
+    """)
+
+if args.whodat2:
+    print(' User Info '.center(90,'-'))
+    os.system(f"""
+    ldapsearch -x -LLL "(gecos=*{args.whodat2}*)"
+    """)
 
 if args.agent:
     if args.agent == 'start':
