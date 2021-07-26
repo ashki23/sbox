@@ -7,11 +7,19 @@
 # Source: https://github.com/ashki23/sbox
 # =============================================================================
 
-import argparse
-import sys
 import os
+import sys
+import json
+import argparse
 
-parser = argparse.ArgumentParser(description = 'Small toolbox for Slurm users', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
+with open('./config') as cfg:
+    config = json.load(cfg)
+
+part_cpu = config['cpu_partition']
+part_gpu = config['gpu_partition']
+user = os.getenv('USER')
+
+parser = argparse.ArgumentParser(description = 'Small toolbox for Slurm users.', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
 parser.add_argument('-a', '--account', action = 'store_true', help = 'show slurm accounts')
 parser.add_argument('-f', '--fairshare', action = 'store_true', help = 'show fairshare')
 parser.add_argument('-g', '--group', action = 'store_true',  help = 'show posix groups')
@@ -19,19 +27,19 @@ parser.add_argument('-q', '--queue', action = 'store_true', help = 'show jobs in
 parser.add_argument('-j', '--job', type = int, help = 'show a running/pending job info', metavar = 'JOBID')
 parser.add_argument('-c', '--cpu', action = 'store_true', help = 'show computational resources')
 parser.add_argument('-p', '--partition', action = 'store_true', help = 'show partitions')
-parser.add_argument('-u', '--user', nargs = '?', default = '$USER', help = 'user id', metavar = 'UID')
-parser.add_argument('--eff', type = int, help = 'show efficiency of a job', metavar = '')
+parser.add_argument('-u', '--user', nargs = '?', default = user, help = 'user id', metavar = 'UID')
+parser.add_argument('--eff', type = int, help = 'show efficiency of a job', metavar = 'JOBID')
 parser.add_argument('--history', choices = ['day','week','month','year'], help = 'show jobs history for last day/week/month/year')
 parser.add_argument('--pending', action = 'store_true', help = 'show pending jobs')
 parser.add_argument('--running', action = 'store_true', help = 'show running jobs')
 parser.add_argument('--qos', action = 'store_true', help = 'show quality of services')
+parser.add_argument('--quota', action = 'store_true', help = 'show quotas')
 parser.add_argument('--ncpu', action = 'store_true', help = 'show number of available cpus')
 parser.add_argument('--ngpu', action = 'store_true', help = 'show number of available gpus')
 parser.add_argument('--gpu', action = 'store_true', help = 'show gpu resources')
 parser.add_argument('--license', action = 'store_true', help = 'show available licenses')
 parser.add_argument('--reserve', action = 'store_true', help = 'show reservation')
 parser.add_argument('--topusage', action = 'store_true', help = 'show top usage users')
-parser.add_argument('--quota', action = 'store_true', help = 'show quotas')
 parser.add_argument('--whodat', help = 'show users informations by uid', metavar = 'UID')
 parser.add_argument('--whodat2', help = 'show users informations by name', metavar = 'NAME')
 parser.add_argument('--agent', choices = ['start','stop','list'], help = 'start/stop/list ssh-agents on the current host')
@@ -41,36 +49,32 @@ if len(sys.argv) == 1:
     parser.print_help(sys.stderr)
     sys.exit(1)
 
-part_cpu = ['Interactive','BioCompute','Lewis','Serial','Dtn','hpc3','hpc4','hpc4rc','hpc5','hpc6','General','Gpu']
-part_gpu = ['gpu3','gpu4']
-user = os.getenv('USER')
-
 if args.account:
     print(' Accounts '.center(90,'-'))
     os.system(f"""
-    sacctmgr show assoc -np user={args.user} format=account | tr "|\n" " " && echo \n
-    echo \n
+    sacctmgr show assoc -np user={args.user} format=account | tr "|\n" " " && echo
+    echo
     """)
 
 if args.fairshare:
     print(' Fairshare '.center(90,'-'))
     os.system(f"""
     sshare -Uu {args.user}
-    echo \n
+    echo
     """)
 
 if args.group:
     print(' Groups '.center(90,'-'))
     os.system(f"""
     groups {args.user}
-    echo \n
+    echo
     """)
 
 if args.queue:
     print(' Jobs in the Queue '.center(90,'-'))
     os.system(f"""
     squeue -u {args.user}
-    echo \n
+    echo
     """)
 
 if args.job:
@@ -83,14 +87,14 @@ if args.cpu:
     print(' CPU/Mem per Node '.center(90,'-'))
     os.system("""
     sjstat -c
-    echo \n
+    echo
     """)
 
 if args.partition:
     print(' Partitions '.center(90,'-'))
     os.system("""
-    sinfo -s
-    echo \n
+    sinfo -o "%15P %6a %12l %F"
+    echo
     """)
 
 if args.eff:
@@ -120,7 +124,7 @@ EOF
     echo 'RES: shows resident memory which is accurate representation of how much actual physical memory a process is consuming'
     echo '%CPU: shows the percentage of the CPU that is being used by the process'
     fi
-    echo \n
+    echo
     """)
 
 if args.history:
@@ -149,7 +153,7 @@ if args.qos:
     echo "\n The following shows information about RCSS quality of services (QOS):\n"
     sacctmgr show qos format=Name%16,MaxWall,MaxSubmit,GrpTRES%8,GrpJobs,MaxTRES,MaxTRESPU,MaxJobsPU,MaxSubmit
     echo "\n Note that blank means there is no limit."
-    echo \n
+    echo
     """)
 
 if args.ncpu:
@@ -166,7 +170,7 @@ if args.ngpu:
     print(' Number of GPUs '.center(90,'-'))
     for g in part_gpu:
         unavail = os.popen(f"""
-        sacct -X --allusers --format JobID,partition,Reqgres,stat,user | grep RUNNING | grep -i {g} | awk '{{ print $3 }}' | awk 'BEGIN{{ FS=":" }} {{ total+=$2 }} END{{ print total }}'
+        squeue -O jobid,partition,gres,state,username | grep RUNNING | grep -i {g} | awk '{{ print $3 }}' | awk 'BEGIN{{ FS=":" }} {{ total+=$2 }} END{{ print total }}'
         """).read().strip()
         try:
             unavail = int(unavail)
@@ -189,14 +193,14 @@ if args.gpu:
     print(' GPU Resources '.center(90,'-'))
     os.system("""
     sinfo -p Gpu -o %n,%G
-    echo \n
+    echo
     """)
 
 if args.license:
     print(' Licenses '.center(90,'-'))
     os.system("""
     scontrol show licenses
-    echo \n
+    echo
     """)
 
 if args.reserve:
@@ -211,74 +215,88 @@ if args.topusage:
     sreport user topusage
     """)
 
-if args.quota:
-    if args.user == user:
-        print(' Home Storage '.center(90,'-'))
-        os.system(f"""
-        df -h /home/{args.user}
-        echo \n
-        """)
-        
-        print(' Data Storage '.center(90,'-'))
-        os.system(f"""
-        lfs quota -hg {args.user} /storage/hpc
-        echo \n
-        """)
-        
-        gpn = os.popen("""
-        echo $(groups | grep -Po "[A-Za-z0-9-]+-group")
-        """).read().strip().split()
-        
-        if len (gpn) > 0:
-            for g in gpn:
-                print(' Group Storages '.center(90,'-'))
-                gn = g.replace('-group','')
-                os.system(f"""
-                lfs quota -hg {g} /storage/hpc
-                echo \n
-                
-                if [ -d /storage/htc/{gn} ]; then
-                df -h /storage/htc/{gn}
-                echo \n
-                fi
-                
-                if [ -d /gprs/{gn} ]; then
-                df -h /gprs/{gn}
-                echo \n
-                fi
-                """)
-    else:
-        print(' Home Storage '.center(90,'-'))
-        os.system(f"""
-        df -h /home/{args.user}
-        echo \n
-        """)
-        
-        gpn = os.popen(f"""
-        echo $(groups {args.user} | grep -Po "(?<=: ).*")
-        """).read().strip()
-        
-        print(' HPC Storage '.center(90,'-'))
-        os.system(f"""
-        rcss-lfs-quota {gpn[:]}
-        echo \n
-        """)
-
 if args.whodat:
     print(' User Info '.center(90,'-'))
     os.system(f"""
+    if [ -z `which ldapsearch 2> /dev/null` ]; then echo "ldapsearch is not availble."; exit; fi
     ldapsearch -x -LLL "(uid=*{args.whodat}*)"
     """)
 
 if args.whodat2:
     print(' User Info '.center(90,'-'))
     os.system(f"""
+    if [ -z `which ldapsearch 2> /dev/null` ]; then echo "ldapsearch is not availble."; exit; fi
     ldapsearch -x -LLL "(gecos=*{args.whodat2}*)"
     """)
+
+if args.quota:
+    disk_quota = config['disk_quota_paths']
+    gpn = os.popen(f"""
+    echo $(groups {args.user} | grep -Po "(?<=: ).*")
+    """).read().strip().split()
+    print(gpn)
+    if args.user == user:
+        if args.user not in gpn:
+            for d in disk_quota:
+                os.system(f"""
+                rm ~/.quota
+                lfs quota -hu {args.user} {d} > ~/.quota 2> /dev/null
+                if [ -s ~/.quota ]; then
+                if ! grep -q " 0. * 0. * 0. " ~/.quota; then
+                python3 -c "print(' {args.user} {d} storage '.center(95,'-'))"
+                cat ~/.quota | grep -Pv "setting|gid|uid";
+                python3 -c "print(''.center(95,'-'))"; fi
+                else if [ -d {d}/{args.user} ]; then
+                python3 -c "print(' {args.user} {d} storage '.center(95,'-'))"
+                df -h --output="file,used,pcent,avail,size,fstype" {d}/{args.user} | tr -s ' ' ',' | sed -e 's/^/,,,/' | column -t -s ',';
+                python3 -c "print(''.center(95,'-'))"; fi
+                fi
+                """)
+        
+        for g in gpn:
+            for d in disk_quota:
+                os.system(f"""
+                rm ~/.quota
+                lfs quota -hg {g} {d} > ~/.quota 2> /dev/null
+                if [ -s ~/.quota ]; then
+                if ! grep -q " 0. * 0. * 0. " ~/.quota; then
+                python3 -c "print(' {g} {d} storage '.center(95,'-'))"
+                cat ~/.quota | grep -Pv "setting|gid|uid";
+                python3 -c "print(''.center(95,'-'))"; fi
+                else if [ -d {d}/{g} ]; then
+                python3 -c "print(' {g} {d} storage '.center(95,'-'))"
+                df -h --output="file,used,pcent,avail,size,fstype" {d}/{g} | tr -s ' ' ',' | sed -e 's/^/,,,/' | column -t -s ',';
+                python3 -c "print(''.center(95,'-'))"; fi
+                fi
+                """)
+    
+    else:
+        print(' Home Storage '.center(122,'-'))
+        os.system(f"""
+        rm ~/.quota
+        lfs quota -hu {args.user} {disk_quota[0]} > ~/.quota 2> /dev/null
+        if [ -s ~/.quota ]; then
+        if ! grep -q " 0. * 0. * 0. " ~/.quota; then
+        cat ~/.quota | grep -Pv "setting|gid|uid";
+        python3 -c "print(''.center(122,'-'))"; fi
+        else if [ -d {disk_quota[0]}/{args.user} ]; then
+        df -h --output="file,used,pcent,avail,size,fstype" {disk_quota[0]}/{args.user} | tr -s ' ' ',' | sed -e 's/^/,,,/' | column -t -s ',';
+        python3 -c "print(''.center(122,'-'))"; fi
+        fi
+        """)
+        
+        gpn = ' '.join(gpn)
+        os.system(f"""
+        if [ -z `which rcss-lfs-quota 2> /dev/null` ]; then echo "No rcss-lfs-quota found! You may try the command from the login node.\n"; exit; fi
+        python -c "print(' HPC Storage '.center(122,'-'))"
+        rcss-lfs-quota {gpn[:]}
+        echo
+        """)
 
 if args.agent:
     if args.agent == 'start':
         os.system("""
+        if [ -z `which ssh-agent 2> /dev/null` ]; then echo "No ssh-agent found!"; exit; fi
         if [ -f ~/.ssh/id_rsa ]; then
         if ! ps -elf | grep ssh-agent | grep -v grep | grep -q $USER; then
         echo "Starting an agent on $(hostname) ..."
@@ -295,7 +313,7 @@ fi
 # <<< ssh-agent <<<
 " >> /home/$USER/.bashrc
         fi
-        echo "The ssh-agent authentication is added to ~/.bashrc. Run 'source ~/.bashrc' to apply the changes."
+        echo "The ssh-agent authentication is added to ~/.bashrc. $(tput bold)Run 'source ~/.bashrc' to apply the changes.$(tput sgr0)"
         else
         if [ -z $SSH_AUTH_SOCK ]; then
         echo "An agent is running but the authentication is not available. Stop the agent with -k and rerun the command."
