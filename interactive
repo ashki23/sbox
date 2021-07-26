@@ -10,9 +10,10 @@
 import os
 import sys
 import json
+import pathlib
 import argparse
 
-with open('./config') as cfg:
+with open(f'{pathlib.Path(__file__).parent.absolute()}/config') as cfg:
     config = json.load(cfg)
 
 jupyter_partition = list(config['jupyter_partition_timelimit'].keys())
