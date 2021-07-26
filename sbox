@@ -234,21 +234,20 @@ if args.quota:
     gpn = os.popen(f"""
     echo $(groups {args.user} | grep -Po "(?<=: ).*")
     """).read().strip().split()
-    print(gpn)
     if args.user == user:
         if args.user not in gpn:
             for d in disk_quota:
                 os.system(f"""
                 rm ~/.quota
-                lfs quota -hu {args.user} {d} > ~/.quota 2> /dev/null
+                lfs quota -hu {user} {d} > ~/.quota 2> /dev/null
                 if [ -s ~/.quota ]; then
                 if ! grep -q " 0. * 0. * 0. " ~/.quota; then
-                python3 -c "print(' {args.user} {d} storage '.center(95,'-'))"
+                python3 -c "print(' {user} {d} storage '.center(95,'-'))"
                 cat ~/.quota | grep -Pv "setting|gid|uid";
                 python3 -c "print(''.center(95,'-'))"; fi
-                else if [ -d {d}/{args.user} ]; then
-                python3 -c "print(' {args.user} {d} storage '.center(95,'-'))"
-                df -h --output="file,used,pcent,avail,size,fstype" {d}/{args.user} | tr -s ' ' ',' | sed -e 's/^/,,,/' | column -t -s ',';
+                else if [ -d {d}/{user} ]; then
+                python3 -c "print(' {user} {d} storage '.center(95,'-'))"
+                df -h --output="file,used,pcent,avail,size,fstype" {d}/{user} | tr -s ' ' ',' | sed -e 's/^/,,,/' | column -t -s ',';
                 python3 -c "print(''.center(95,'-'))"; fi
                 fi
                 """)
@@ -272,9 +271,13 @@ if args.quota:
     
     else:
         print(' Home Storage '.center(122,'-'))
+        if args.user in gpn:
+            lfsq = 'g'
+        else:
+            lfsq = 'u'
         os.system(f"""
         rm ~/.quota
-        lfs quota -hu {args.user} {disk_quota[0]} > ~/.quota 2> /dev/null
+        lfs quota -h{lfsq} {args.user} {disk_quota[0]} > ~/.quota 2> /dev/null
         if [ -s ~/.quota ]; then
         if ! grep -q " 0. * 0. * 0. " ~/.quota; then
         cat ~/.quota | grep -Pv "setting|gid|uid";
