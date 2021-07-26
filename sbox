@@ -150,7 +150,7 @@ if args.qos:
     print(' QOS '.center(90,'-'))
     os.system(f"""
     sacctmgr show assoc format=account%15,share%7,qos%56 user={args.user}
-    echo "\n The following shows information about RCSS quality of services (QOS):\n"
+    echo "\n The following shows information about the available quality of services (QOS):\n"
     sacctmgr show qos format=Name%16,MaxWall,MaxSubmit,GrpTRES%8,GrpJobs,MaxTRES,MaxTRESPU,MaxJobsPU,MaxSubmit
     echo "\n Note that blank means there is no limit."
     echo
@@ -238,7 +238,7 @@ if args.quota:
         if args.user not in gpn:
             for d in disk_quota:
                 os.system(f"""
-                rm ~/.quota
+                rm -f ~/.quota
                 lfs quota -hu {user} {d} > ~/.quota 2> /dev/null
                 if [ -s ~/.quota ]; then
                 if ! grep -q " 0. * 0. * 0. " ~/.quota; then
@@ -255,7 +255,7 @@ if args.quota:
         for g in gpn:
             for d in disk_quota:
                 os.system(f"""
-                rm ~/.quota
+                rm -f ~/.quota
                 lfs quota -hg {g} {d} > ~/.quota 2> /dev/null
                 if [ -s ~/.quota ]; then
                 if ! grep -q " 0. * 0. * 0. " ~/.quota; then
@@ -303,18 +303,18 @@ if args.agent:
         if [ -f ~/.ssh/id_rsa ]; then
         if ! ps -elf | grep ssh-agent | grep -v grep | grep -q $USER; then
         echo "Starting an agent on $(hostname) ..."
-        install -d /home/$USER/.ssh_auth
+        install -d ~/.ssh_auth
         eval `ssh-agent -s`
         ssh-add
-        echo $SSH_AUTH_SOCK > /home/$USER/.ssh_auth/$(hostname)
-        if ! grep -q SSH_AUTH_SOCK /home/$USER/.bashrc; then
+        echo $SSH_AUTH_SOCK > ~/.ssh_auth/$(hostname)
+        if ! grep -q SSH_AUTH_SOCK ~/.bashrc; then
         echo "
 # >>> ssh-agent >>>
-if [ -f /home/$USER/.ssh_auth/\$(hostname) ]; then
-export SSH_AUTH_SOCK=\`cat /home/$USER/.ssh_auth/\$(hostname)\`
+if [ -f ~/.ssh_auth/\$(hostname) ]; then
+export SSH_AUTH_SOCK=\`cat ~/.ssh_auth/\$(hostname)\`
 fi
 # <<< ssh-agent <<<
-" >> /home/$USER/.bashrc
+" >> ~/.bashrc
         fi
         echo "The ssh-agent authentication is added to ~/.bashrc. $(tput bold)Run 'source ~/.bashrc' to apply the changes.$(tput sgr0)"
         else
@@ -333,7 +333,7 @@ fi
         if ps -elf | grep ssh-agent | grep -v grep | grep -q $USER; then
         echo "Stopping the current agent on $(hostname) ..."
         kill `ps -elf | grep ssh-agent | grep -v grep | grep $USER | awk '{print $4}'`
-        rm -f /home/$USER/.ssh_auth/$(hostname)
+        rm -f ~/.ssh_auth/$(hostname)
         else
         echo "No running agent found on $(hostname)."
         fi
