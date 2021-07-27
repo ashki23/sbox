@@ -8,6 +8,7 @@
 # =============================================================================
 
 import os
+import re
 import sys
 import json
 import pathlib
@@ -18,7 +19,10 @@ with open(f'{pathlib.Path(__file__).parent.absolute()}/config') as cfg:
 
 part_cpu = config['cpu_partition']
 part_gpu = config['gpu_partition']
-user = os.getenv('USER')
+user = os.getenv('USER').strip()
+if not bool(re.fullmatch('[a-zA-Z0-9.]+', user)):
+    print('Unknown user! Make sure $USER retruns the userid.')
+    sys.exit(0)
 
 parser = argparse.ArgumentParser(description = 'Small toolbox for Slurm users.', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
 parser.add_argument('-a', '--account', action = 'store_true', help = 'show slurm accounts')
@@ -28,7 +32,7 @@ parser.add_argument('-q', '--queue', action = 'store_true', help = 'show jobs in
 parser.add_argument('-j', '--job', type = int, help = 'show a running/pending job info', metavar = 'JOBID')
 parser.add_argument('-c', '--cpu', action = 'store_true', help = 'show computational resources')
 parser.add_argument('-p', '--partition', action = 'store_true', help = 'show partitions')
-parser.add_argument('-u', '--user', nargs = '?', default = user, help = 'user id', metavar = 'UID')
+parser.add_argument('-u', '--user', default = user, help = 'user id', metavar = 'UID')
 parser.add_argument('-v', '--version', action = 'version', version = '%(prog)s 1.1')
 parser.add_argument('--eff', type = int, help = 'show efficiency of a job', metavar = 'JOBID')
 parser.add_argument('--history', choices = ['day','week','month','year'], help = 'show jobs history for last day/week/month/year')
@@ -50,6 +54,15 @@ args = parser.parse_args()
 if len(sys.argv) == 1:
     parser.print_help(sys.stderr)
     sys.exit(1)
+
+if args.user:
+    args.user = args.user.strip()
+    if not bool(re.fullmatch('[a-zA-Z0-9.]+', args.user)):
+        print('Unknown user! Remove -u option or enter a valid userid.')
+        sys.exit(0)
+else:
+    print('Unknown user! Remove -u option or enter a valid userid.')
+    sys.exit(0)
 
 if args.account:
     print(' Accounts '.center(90,'-'))
@@ -103,14 +116,14 @@ if args.eff:
     print(' Job Efficiency '.center(90,'-'))
     os.system(f"""
     install -d ~/.seff
-    rm -f ~/.seff/seff.out
+    rm ~/.seff/seff.out 2> /dev/null
     if sacct -Xj {args.eff} | grep -iq "COMPLETED"; then
     seff {args.eff}
     else
     cat > ~/.seff/seff-job.sh <<EOF
 #!/bin/bash
 #SBATCH --jobid {args.eff}
-top -u $USER -b -n 1 > ~/.seff/seff.out
+top -u {user} -b -n 1 > ~/.seff/seff.out
 EOF
     sleep 0.1
     if squeue -j {args.eff} | grep -q '0:00'; then
@@ -121,7 +134,7 @@ EOF
     while [ ! -f ~/.seff/seff.out ]; do
     sleep 0.5
     done
-    cat ~/.seff/seff.out | grep -P "$USER|PID" | grep -v top | grep -v slurm_scri
+    cat ~/.seff/seff.out | grep -P "{user}|PID" | grep -v top | grep -v slurm_scri
     echo
     echo 'RES: shows resident memory which is accurate representation of how much actual physical memory a process is consuming'
     echo '%CPU: shows the percentage of the CPU that is being used by the process'
@@ -218,6 +231,11 @@ if args.topusage:
     """)
 
 if args.whodat:
+    args.whodat = args.whodat.strip()
+    if not bool(re.fullmatch('[a-zA-Z0-9.]+', args.whodat)):
+        print('Unknown user! Enter a valid userid.')
+        sys.exit(0)
+    
     print(' User Info '.center(90,'-'))
     os.system(f"""
     if [ -z `which ldapsearch 2> /dev/null` ]; then echo "ldapsearch is not availble."; exit; fi
@@ -225,6 +243,11 @@ if args.whodat:
     """)
 
 if args.whodat2:
+    args.whodat2 = args.whodat2.strip()
+    if not bool(re.fullmatch('[a-zA-Z 0-9]+', args.whodat2)):
+        print('Unknown user! Enter a valid username.')
+        sys.exit(0)
+    
     print(' User Info '.center(90,'-'))
     os.system(f"""
     if [ -z `which ldapsearch 2> /dev/null` ]; then echo "ldapsearch is not availble."; exit; fi
@@ -240,7 +263,7 @@ if args.quota:
         if args.user not in gpn:
             for d in disk_quota:
                 os.system(f"""
-                rm -f ~/.quota
+                rm ~/.quota 2> /dev/null
                 lfs quota -hu {user} {d} > ~/.quota 2> /dev/null
                 if [ -s ~/.quota ]; then
                 if ! grep -q " 0. * 0. * 0. " ~/.quota; then
@@ -257,7 +280,7 @@ if args.quota:
         for g in gpn:
             for d in disk_quota:
                 os.system(f"""
-                rm -f ~/.quota
+                rm ~/.quota 2> /dev/null
                 lfs quota -hg {g} {d} > ~/.quota 2> /dev/null
                 if [ -s ~/.quota ]; then
                 if ! grep -q " 0. * 0. * 0. " ~/.quota; then
@@ -278,7 +301,7 @@ if args.quota:
         else:
             lfsq = 'u'
         os.system(f"""
-        rm ~/.quota
+        rm ~/.quota 2> /dev/null
         lfs quota -h{lfsq} {args.user} {disk_quota[0]} > ~/.quota 2> /dev/null
         if [ -s ~/.quota ]; then
         if ! grep -q " 0. * 0. * 0. " ~/.quota; then
@@ -300,10 +323,10 @@ if args.quota:
 
 if args.agent:
     if args.agent == 'start':
-        os.system("""
+        os.system(f"""
         if [ -z `which ssh-agent 2> /dev/null` ]; then echo "No ssh-agent found!"; exit; fi
         if [ -f ~/.ssh/id_rsa ]; then
-        if ! ps -elf | grep ssh-agent | grep -v grep | grep -q $USER; then
+        if ! ps -elf | grep ssh-agent | grep -v grep | grep -q {user}; then
         echo "Starting an agent on $(hostname) ..."
         install -d ~/.ssh_auth
         eval `ssh-agent -s`
@@ -331,20 +354,20 @@ fi
         """)
 
     if args.agent == 'stop':
-        os.system("""
-        if ps -elf | grep ssh-agent | grep -v grep | grep -q $USER; then
+        os.system(f"""
+        if ps -elf | grep ssh-agent | grep -v grep | grep -q {user}; then
         echo "Stopping the current agent on $(hostname) ..."
-        kill `ps -elf | grep ssh-agent | grep -v grep | grep $USER | awk '{print $4}'`
-        rm -f ~/.ssh_auth/$(hostname)
+        kill `ps -elf | grep ssh-agent | grep -v grep | grep {user} | awk '{{print $4}}'`
+        rm ~/.ssh_auth/$(hostname) 2> /dev/null
         else
         echo "No running agent found on $(hostname)."
         fi
         """)
 
     if args.agent == 'list':
-        os.system("""
-        if ps -elf | grep ssh-agent | grep -v grep | grep -q $USER; then
-        ps -elf | grep ssh-agent | grep -v grep | grep $USER
+        os.system(f"""
+        if ps -elf | grep ssh-agent | grep -v grep | grep -q {user}; then
+        ps -elf | grep ssh-agent | grep -v grep | grep {user}
         else
         echo "No running agent found on $(hostname)."
         fi

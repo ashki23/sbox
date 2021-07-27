@@ -38,7 +38,7 @@ else:
     parser.add_argument('-l', '--license', help = 'license', metavar = '')
 parser.add_argument('-m', '--mem', type = int, default = 2, help = 'amount of memory per GB', metavar = '')
 parser.add_argument('-g', '--gpu', type = int, default = 0, choices = range(3), help = 'number of gpus', metavar = '')
-parser.add_argument('jupyter', nargs = '?', help = 'Starting Jupyter server on the cluster')
+parser.add_argument('jupyter', nargs = '?', choices = ['jupyter'], help = 'Starting Jupyter server on the cluster')
 args = parser.parse_args()
 
 if args.partition in config['partition_qos'].keys():
@@ -119,7 +119,7 @@ jupyter-lab --no-browser --ip 0.0.0.0
     
     os.system(f"""
 cd ~
-rm -f ~/.jupyter/job/{kernel}-*.out
+rm ~/.jupyter/job/{kernel}-*.out 2> /dev/null
 jid=$(sbatch --parsable ~/.jupyter/job/{kernel}-jupyter-job)
 echo {announce}
 echo "Starting Jupyter server (it might take about a couple minutes) ..."
