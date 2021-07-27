@@ -20,9 +20,9 @@ with open(f'{pathlib.Path(__file__).parent.absolute()}/../config') as cfg:
 part_cpu = config['cpu_partition']
 part_gpu = config['gpu_partition']
 user = os.getenv('USER').strip()
-if not bool(re.fullmatch('[a-zA-Z0-9.]+', user)):
+if not bool(re.fullmatch('[a-zA-Z0-9\-_\.]+', user)):
     print('Unknown user! Make sure $USER retruns the userid.')
-    sys.exit(0)
+    sys.exit(1)
 
 parser = argparse.ArgumentParser(description = 'Small toolbox for Slurm users.', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
 parser.add_argument('-a', '--account', action = 'store_true', help = 'show slurm accounts')
@@ -53,16 +53,16 @@ args = parser.parse_args()
 
 if len(sys.argv) == 1:
     parser.print_help(sys.stderr)
-    sys.exit(1)
+    sys.exit(0)
 
 if args.user:
     args.user = args.user.strip()
-    if not bool(re.fullmatch('[a-zA-Z0-9.]+', args.user)):
+    if not bool(re.fullmatch('[a-zA-Z0-9\-_\.]+', args.user)):
         print('Unknown user! Remove -u option or enter a valid userid.')
-        sys.exit(0)
+        sys.exit(1)
 else:
     print('Unknown user! Remove -u option or enter a valid userid.')
-    sys.exit(0)
+    sys.exit(1)
 
 if args.account:
     print(' Accounts '.center(90,'-'))
@@ -232,9 +232,9 @@ if args.topusage:
 
 if args.whodat:
     args.whodat = args.whodat.strip()
-    if not bool(re.fullmatch('[a-zA-Z0-9.]+', args.whodat)):
+    if not bool(re.fullmatch('[a-zA-Z0-9\-_\.]+', args.whodat)):
         print('Unknown user! Enter a valid userid.')
-        sys.exit(0)
+        sys.exit(1)
     
     print(' User Info '.center(90,'-'))
     os.system(f"""
@@ -244,9 +244,9 @@ if args.whodat:
 
 if args.whodat2:
     args.whodat2 = args.whodat2.strip()
-    if not bool(re.fullmatch('[a-zA-Z 0-9]+', args.whodat2)):
+    if not bool(re.fullmatch('[a-zA-Z0-9 \-_\.]+', args.whodat2)):
         print('Unknown user! Enter a valid username.')
-        sys.exit(0)
+        sys.exit(1)
     
     print(' User Info '.center(90,'-'))
     os.system(f"""
