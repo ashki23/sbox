@@ -1,0 +1,9 @@
+{
+    "cpu_partition": [],
+    "gpu_partition": [],
+    "interactive_partition_timelimit": {},
+    "jupyter_partition_timelimit": {},
+    "partition_qos": {},
+    "partition_general_account_deny": [],
+    "disk_quota_paths": []
+}
