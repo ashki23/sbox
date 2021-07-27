@@ -14,7 +14,7 @@ import json
 import pathlib
 import argparse
 
-with open(f'{pathlib.Path(__file__).parent.absolute()}/config') as cfg:
+with open(f'{pathlib.Path(__file__).parent.absolute()}/../config') as cfg:
     config = json.load(cfg)
 
 part_cpu = config['cpu_partition']

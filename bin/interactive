@@ -13,13 +13,23 @@ import json
 import pathlib
 import argparse
 
-with open(f'{pathlib.Path(__file__).parent.absolute()}/config') as cfg:
+with open(f'{pathlib.Path(__file__).parent.absolute()}/../config') as cfg:
     config = json.load(cfg)
 
 jupyter_partition = list(config['jupyter_partition_timelimit'].keys())
-jupyter_timelimt = max(list(config['jupyter_partition_timelimit'].values()))
+try:
+    jupyter_timelimt = max(list(config['jupyter_partition_timelimit'].values()))
+except ValueError:
+    print('Config file is empty! Update the config file based on the cluster partitions and timelimits.')
+    sys.exit(1)
+
 interactive_partition = list(config['interactive_partition_timelimit'].keys())
-interactive_timelimt = max(list(config['interactive_partition_timelimit'].values()))
+try:
+    interactive_timelimt = max(list(config['interactive_partition_timelimit'].values()))
+except ValueError:
+    print('Config file is empty! Update the config file based on the cluster partitions and timelimits.')
+    sys.exit(1)
+
 user = os.getenv('USER')
 home = os.getenv('HOME')
 host_name = os.popen('hostname').read().strip()
