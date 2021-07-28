@@ -140,7 +140,7 @@ jupyter-lab --no-browser --ip 0.0.0.0\n""")
     os.system(f"""
 cd ~
 rm ~/.jupyter/job/{kernel}-*.out 2> /dev/null
-jid=$(sbatch --parsable ~/.jupyter/job/{kernel}-jupyter-job)
+jid=$(sbatch --parsable ~/.jupyter/job/{kernel}-jupyter-job) || exit
 if [ -z `echo $jid` ]; then exit; fi
 echo {announce}
 echo "Starting Jupyter server (it might take about a couple minutes) ..."

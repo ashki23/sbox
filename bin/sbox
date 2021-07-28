@@ -121,20 +121,14 @@ if args.eff:
     os.system(f"""
     install -d ~/.seff
     rm ~/.seff/seff.out 2> /dev/null
-    if sacct -Xj {args.eff} | grep -iq "COMPLETED"; then
-    seff {args.eff}
-    else
+    if squeue -u {user} --format "%i %T" | grep {args.eff} | grep -Piq "RUNNING"; then
     cat > ~/.seff/seff-job.sh <<EOF
 #!/bin/bash
 #SBATCH --jobid {args.eff}
 top -u {user} -b -n 1 > ~/.seff/seff.out
 EOF
     sleep 0.1
-    if squeue -j {args.eff} | grep -q '0:00'; then
-    echo 'Job is not running. Retry when the job is started!'
-    exit
-    fi
-    srun --jobid {args.eff} /bin/bash ~/.seff/seff-job.sh
+    srun --jobid {args.eff} /bin/bash ~/.seff/seff-job.sh || exit
     while [ ! -f ~/.seff/seff.out ]; do
     sleep 0.5
     done
@@ -142,27 +136,29 @@ EOF
     echo
     echo 'RES: shows resident memory which is accurate representation of how much actual physical memory a process is consuming'
     echo '%CPU: shows the percentage of the CPU that is being used by the process'
+    else
+    seff {args.eff}
     fi
     echo
     """)
 
 if args.history:
-    print(f" Jobs History - Last {args.history.capitalize()} ".center(123,'-'))
+    print(f" Jobs History - Last {args.history.capitalize()} ".center(185,'-'))
     os.system(f"""
-    sacct --user {args.user} --state bf,ca,cd,dl,f,nf,pr,s,to --allocations --format jobid%10,user%6,account%7,state%10,partition%9,qos%7,ncpus%5,nnodes%5,reqmem%5,submit,reserved,start,elapsed,end,nodelist%30,jobname%15 -S $(date --date='{args.history} ago' +"%Y-%m-%d")
+    sacct --user {args.user} --state bf,ca,cd,dl,f,nf,pr,s,to --allocations --format jobid%10,user%6,account%7,state%10,partition%9,qos%7,ncpus%4,nnodes%4,reqmem%6,submit,reserved,start,elapsed,end,nodelist%20,jobname -S $(date --date='{args.history} ago' +"%Y-%m-%d")
     echo
     """)
 
 if args.running:
-    print(' Running Jobs '.center(90,'-'))
+    print(' Running Jobs '.center(170,'-'))
     os.system(f"""
-    sacct --user {args.user} --state R --allocations --format jobid%10,user%6,account%7,state%10,partition%9,qos%7,ncpus%5,nnodes%5,reqmem%5,submit,reserved,start,elapsed,Timelimit,nodelist%30,jobname%15
+    squeue --user {args.user} --states RUNNING --sort S --format "%10i %6u %7a %10T %9P %7q %5C %5D %7m %20V %20S %10M %10l %25N %j"
     """)
 
 if args.pending:
-    print(' Pending Jobs '.center(90,'-'))
+    print(' Pending Jobs '.center(175,'-'))
     os.system(f"""
-    squeue --user {args.user} --states PENDING --sort S --format "%10i %6u %7a %10T %9P %7q %5C %5D %5m %20V %20S %30Y %10r %j"
+    squeue --user {args.user} --states PENDING --sort S --format "%10i %6u %7a %10T %9P %7q %5C %5D %7m %20V %20S %25Y %20r %j"
     """)
 
 if args.qos:
