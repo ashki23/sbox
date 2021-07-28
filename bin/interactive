@@ -33,11 +33,9 @@ except ValueError:
 user = os.getenv('USER').strip()
 home = os.getenv('HOME').strip()
 host_name = os.popen('hostname').read().strip()
-user_accounts = os.popen(f"sacctmgr show assoc -np user={user} format=account | tr '|\n' ' '").read().strip().split()
-cluster_lic = os.popen("scontrol show licenses | grep -i name | grep -Po '(?<==).*'").read().strip().split()
 
 parser = argparse.ArgumentParser(description = 'An alias for using cluster interactively', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
-parser.add_argument('-A', '--account', choices = user_accounts, default = 'general', help = 'account name', metavar = '')
+parser.add_argument('-A', '--account', help = 'account name', metavar = '')
 parser.add_argument('-n', '--ntasks', type = int, default = 1, help = 'number of tasks (cpus)', metavar = '')
 parser.add_argument('-N', '--nodes', type = int, default = 1, help = 'number of nodes', metavar = '')
 if 'jupyter' in sys.argv:
@@ -47,7 +45,7 @@ if 'jupyter' in sys.argv:
 else:
     parser.add_argument('-p', '--partition', choices = interactive_partition, default = interactive_partition[0], help = 'partition name', metavar = '')
     parser.add_argument('-t', '--time', type = int, choices = range(1, interactive_timelimt + 1), default = 2, help = f'number of hours (up to {interactive_timelimt})', metavar = '')
-    parser.add_argument('-l', '--license', choices = cluster_lic, help = 'license', metavar = '')
+    parser.add_argument('-l', '--license', help = 'license', metavar = '')
     parser.epilog = 'Command should be run from the login node.'
 parser.add_argument('-m', '--mem', type = int, default = 2, help = 'amount of memory per GB', metavar = '')
 parser.add_argument('-g', '--gpu', type = int, default = 0, choices = range(3), help = 'number of gpus', metavar = '')
@@ -58,10 +56,6 @@ if args.partition in config['partition_qos'].keys():
     qos = config['partition_qos'][args.partition]
 else:
     qos = 'normal'
-
-if args.account == 'general' and args.partition in config['partition_general_account_deny']:
-    print(f"General account not allowed to use partitions {', '.join(config['partition_general_account_deny'])}. Use another account or change the partiton.")
-    sys.exit(1)
 
 if args.partition not in config['gpu_partition'] and args.gpu > 0:
     print(f"For using gpu resources select one of the gpu partitions ({', '.join(config['gpu_partition'])}).")
@@ -86,13 +80,15 @@ if not args.interface:
         print('Command should be run from the login node')
         sys.exit(1)
     
-    if args.license:
-        print(announce)
+    print(announce)
+    if args.account and args.license:
         os.system(f"srun --partition {args.partition} --qos {qos} --gres gpu:{args.gpu} --ntasks {args.ntasks} --nodes {args.nodes} --mem {args.mem}G --time {args.time}:00:00 --account {args.account} --licenses {args.license}:1 --pty /bin/bash")
-    
-    if not args.license:
-        print(announce)
-        os.system(f"srun --partition {args.partition} --qos {qos} --gres gpu:{args.gpu} --ntasks {args.ntasks}  --nodes {args.nodes} --mem {args.mem}G --time {args.time}:00:00 --account {args.account} --pty /bin/bash")
+    elif args.account and not args.license:
+        os.system(f"srun --partition {args.partition} --qos {qos} --gres gpu:{args.gpu} --ntasks {args.ntasks} --nodes {args.nodes} --mem {args.mem}G --time {args.time}:00:00 --account {args.account} --pty /bin/bash")
+    elif not args.account and args.license:
+        os.system(f"srun --partition {args.partition} --qos {qos} --gres gpu:{args.gpu} --ntasks {args.ntasks} --nodes {args.nodes} --mem {args.mem}G --time {args.time}:00:00 --licenses {args.license}:1 --pty /bin/bash")        
+    else:
+        os.system(f"srun --partition {args.partition} --qos {qos} --gres gpu:{args.gpu} --ntasks {args.ntasks}  --nodes {args.nodes} --mem {args.mem}G --time {args.time}:00:00 --pty /bin/bash")
 
 ## JUPYTER
 if args.interface == 'jupyter':
@@ -120,7 +116,6 @@ if args.interface == 'jupyter':
     with open(f"{home}/.jupyter/job/{kernel}-jupyter-job",'w') as jb:
         jb.write(f"""#!/bin/bash
 #SBATCH --job-name jupyter-{kernel}
-#SBATCH --account {args.account}
 #SBATCH --partition {args.partition}
 #SBATCH --ntasks {args.ntasks}
 #SBATCH --nodes {args.nodes}
@@ -128,25 +123,29 @@ if args.interface == 'jupyter':
 #SBATCH --gres gpu:{args.gpu}
 #SBATCH --qos {qos}
 #SBATCH --time {args.time}:00:00
-#SBATCH --output {home}/.jupyter/job/{kernel}-%j.out
+#SBATCH --output {home}/.jupyter/job/{kernel}-%j.out""")
+        if args.account:
+            jb.write(f"""
+#SBATCH --account {args.account}""")
+        jb.write(f"""
 module load {module}
 if [ "{kernel}" == "julia" ]; then
 module load {config['interface_module']['julia']}
 julia -e 'using Pkg; Pkg.add("IJulia")'; fi
-jupyter-lab --no-browser --ip 0.0.0.0
-        """)
+jupyter-lab --no-browser --ip 0.0.0.0\n""")
     
     os.system(f"""
 cd ~
 rm ~/.jupyter/job/{kernel}-*.out 2> /dev/null
 jid=$(sbatch --parsable ~/.jupyter/job/{kernel}-jupyter-job)
+if [ -z `echo $jid` ]; then exit; fi
 echo {announce}
 echo "Starting Jupyter server (it might take about a couple minutes) ..."
 if [ "{kernel}" == "julia" ]; then echo "Installing Ijulia ... "; fi
 myn=0
 while ! grep -iq 'use control-c' ~/.jupyter/job/{kernel}-$jid.out > /dev/null 2>&1; do
 sleep 10
-if squeue -j $jid | grep -q AccountNotAllowed; then echo "{args.account} account not allowed to use {args.partition}. Use another account or change the partition"; exit; fi
+if squeue -j $jid | grep -q AccountNotAllowed; then echo "{args.account} account not allowed to use {args.partition} partition. Use another account or change the partition."; exit; fi
 echo "Starting Jupyter server ..."
 myn=`expr $myn + 1`
 if [ $myn -eq 15 ]; then
