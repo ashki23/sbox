@@ -30,27 +30,28 @@ except ValueError:
     print('Config file is empty! Update the config file based on the cluster partitions and timelimits.')
     sys.exit(1)
 
-user = os.getenv('USER')
-home = os.getenv('HOME')
+user = os.getenv('USER').strip()
+home = os.getenv('HOME').strip()
 host_name = os.popen('hostname').read().strip()
 user_accounts = os.popen(f"sacctmgr show assoc -np user={user} format=account | tr '|\n' ' '").read().strip().split()
 cluster_lic = os.popen("scontrol show licenses | grep -i name | grep -Po '(?<==).*'").read().strip().split()
 
-parser = argparse.ArgumentParser(description = 'An alias for using cluster interactively', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56), epilog = 'Command should be run from the login node.')
+parser = argparse.ArgumentParser(description = 'An alias for using cluster interactively', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
 parser.add_argument('-A', '--account', choices = user_accounts, default = 'general', help = 'account name', metavar = '')
 parser.add_argument('-n', '--ntasks', type = int, default = 1, help = 'number of tasks (cpus)', metavar = '')
 parser.add_argument('-N', '--nodes', type = int, default = 1, help = 'number of nodes', metavar = '')
 if 'jupyter' in sys.argv:
     parser.add_argument('-p', '--partition', choices = jupyter_partition, default = jupyter_partition[0], help = 'partition name', metavar = '')
     parser.add_argument('-t', '--time', type = int, choices = range(1, jupyter_timelimt + 1), default = 2, help = f'number of hours (up to {jupyter_timelimt})', metavar = '')
-    parser.add_argument('-k', '--kernel', choices = ['R','Python'], default = 'Python', help = 'Jupyter kernel (R/Python)', metavar = '')
+    parser.add_argument('-k', '--kernel', choices = ['r','python','julia'], default = 'python', help = 'Jupyter kernel (r/python/julia)', metavar = '')
 else:
     parser.add_argument('-p', '--partition', choices = interactive_partition, default = interactive_partition[0], help = 'partition name', metavar = '')
     parser.add_argument('-t', '--time', type = int, choices = range(1, interactive_timelimt + 1), default = 2, help = f'number of hours (up to {interactive_timelimt})', metavar = '')
     parser.add_argument('-l', '--license', choices = cluster_lic, help = 'license', metavar = '')
+    parser.epilog = 'Command should be run from the login node.'
 parser.add_argument('-m', '--mem', type = int, default = 2, help = 'amount of memory per GB', metavar = '')
 parser.add_argument('-g', '--gpu', type = int, default = 0, choices = range(3), help = 'number of gpus', metavar = '')
-parser.add_argument('jupyter', nargs = '?', choices = ['jupyter'], help = 'Starting Jupyter server on the cluster')
+parser.add_argument('interface', nargs = '?', choices = ['jupyter'], help = 'Starting Jupyter server on the cluster')
 args = parser.parse_args()
 
 if args.partition in config['partition_qos'].keys():
@@ -75,7 +76,7 @@ else:
     announce = f"Logging into {args.partition} partition with {args.mem}G memory, {args.ntasks} cpu and using account {args.account} for {args.time} hours ..."
 
 ## INTERACTIVE
-if not args.jupyter:
+if not args.interface:
     partition_timelimit = config['interactive_partition_timelimit'][args.partition]
     if args.time > partition_timelimit:
         print(f"Partition time limit. Max time for {args.partition} partition is {partition_timelimit} hours.")
@@ -94,22 +95,25 @@ if not args.jupyter:
         os.system(f"srun --partition {args.partition} --qos {qos} --gres gpu:{args.gpu} --ntasks {args.ntasks}  --nodes {args.nodes} --mem {args.mem}G --time {args.time}:00:00 --account {args.account} --pty /bin/bash")
 
 ## JUPYTER
-if args.jupyter:
+if args.interface == 'jupyter':
     partition_timelimit = config['jupyter_partition_timelimit'][args.partition]
     if args.time > partition_timelimit:
         print(f"Partition time limit. Max time for {args.partition} partition is {partition_timelimit} hours.")
         sys.exit(1)
     
-    if args.kernel == 'R':
+    if args.kernel == 'r':
         kernel = 'r'
-        module = 'r-essentials'
+        module = config['interface_module']['r-jupyter']
+    elif args.kernel == 'julia':
+        kernel = 'julia'
+        module = config['interface_module']['jupyter']
     else:
         kernel = 'py'
-        module = 'anaconda'
+        module = config['interface_module']['jupyter']
     
-    ml_test = os.popen(f"if [ -z `module load {module} > /dev/null 2>&1 && which jupyter-lab 2> /dev/null` ]; then echo 'no-module-found'; fi").read().strip()
-    if ml_test == 'no-module-found':
-        print(f"No {module} module found!")
+    ml_test = os.popen(f"if [ -z `module load {module} > /dev/null 2>&1 && which jupyter-lab 2> /dev/null` ]; then echo 'no-jupyter-found'; fi").read().strip()
+    if ml_test == 'no-jupyter-found':
+        print(f"jupyter-lab not found!")
         sys.exit(1)
     
     os.system(f"install -d ~/.jupyter/job")
@@ -126,6 +130,9 @@ if args.jupyter:
 #SBATCH --time {args.time}:00:00
 #SBATCH --output {home}/.jupyter/job/{kernel}-%j.out
 module load {module}
+if [ "{kernel}" == "julia" ]; then
+module load {config['interface_module']['julia']}
+julia -e 'using Pkg; Pkg.add("IJulia")'; fi
 jupyter-lab --no-browser --ip 0.0.0.0
         """)
     
@@ -135,6 +142,7 @@ rm ~/.jupyter/job/{kernel}-*.out 2> /dev/null
 jid=$(sbatch --parsable ~/.jupyter/job/{kernel}-jupyter-job)
 echo {announce}
 echo "Starting Jupyter server (it might take about a couple minutes) ..."
+if [ "{kernel}" == "julia" ]; then echo "Installing Ijulia ... "; fi
 myn=0
 while ! grep -iq 'use control-c' ~/.jupyter/job/{kernel}-$jid.out > /dev/null 2>&1; do
 sleep 10
