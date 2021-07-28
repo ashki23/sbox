@@ -19,7 +19,11 @@ with open(f'{pathlib.Path(__file__).parent.absolute()}/../config') as cfg:
 
 part_cpu = config['cpu_partition']
 part_gpu = config['gpu_partition']
-user = os.getenv('USER').strip()
+
+try:
+    user = os.getenv('USER').strip()
+except AttributeError:
+    user = os.popen('echo $(whoami)').read().strip()
 if not bool(re.fullmatch('[a-zA-Z0-9\-_\.]+', user)):
     print('Unknown user! Make sure $USER retruns the userid.')
     sys.exit(1)
@@ -47,7 +51,7 @@ parser.add_argument('--license', action = 'store_true', help = 'show available l
 parser.add_argument('--reserve', action = 'store_true', help = 'show reservation')
 parser.add_argument('--topusage', action = 'store_true', help = 'show top usage users')
 parser.add_argument('--whodat', help = 'show users informations by uid', metavar = 'UID')
-parser.add_argument('--whodat2', help = 'show users informations by name', metavar = 'NAME')
+parser.add_argument('--whodat2', help = 'show users informations by name', metavar = 'UNAME')
 parser.add_argument('--agent', choices = ['start','stop','list'], help = 'start/stop/list ssh-agents on the current host')
 args = parser.parse_args()
 
@@ -205,11 +209,12 @@ if args.ngpu:
     print()
 
 if args.gpu:
-    print(' GPU Resources '.center(90,'-'))
-    os.system("""
-    sinfo -p Gpu -o %n,%G
-    echo
-    """)
+    for g in part_gpu:
+        print(f" Gpu Resources in {g} Partition ".center(90,'-'))
+        os.system(f"""
+        sinfo -p {g} -o %n,%G
+        echo
+        """)
 
 if args.license:
     print(' Licenses '.center(90,'-'))
