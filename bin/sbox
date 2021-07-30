@@ -54,9 +54,11 @@ parser.add_argument('--gpu', action = 'store_true', help = 'show gpu resources')
 parser.add_argument('--license', action = 'store_true', help = 'show available licenses')
 parser.add_argument('--reserve', action = 'store_true', help = 'show reservation')
 parser.add_argument('--topusage', action = 'store_true', help = 'show top usage users')
-parser.add_argument('--whodat', help = 'show users informations by uid', metavar = 'UID')
-parser.add_argument('--whodat2', help = 'show users informations by name', metavar = 'UNAME')
-parser.add_argument('--agent', choices = ['start','stop','list'], help = 'start/stop/list ssh-agents on the current host')
+if os.popen('which ldapsearch 2> /dev/null').read():
+    parser.add_argument('--whodat', help = 'show users informations by uid', metavar = 'UID')
+    parser.add_argument('--whodat2', help = 'show users informations by name', metavar = 'UNAME')
+if os.popen('which ssh-agent 2> /dev/null').read():
+    parser.add_argument('--agent', choices = ['start','stop','list'], help = 'start/stop/list ssh-agents on the current host')
 args = parser.parse_args()
 
 if len(sys.argv) == 1:
