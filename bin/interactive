@@ -16,6 +16,13 @@ import argparse
 with open(f'{pathlib.Path(__file__).parent.absolute()}/../config') as cfg:
     config = json.load(cfg)
 
+kernel_all = config['kernel_module']
+if len(config['kernel_module']['python']) == 0:
+    print("Python kernel for Jupyter not found in config kernel_module!")
+    sys.exit(1)
+
+env = config['env_module'].keys()
+
 jupyter_partition = list(config['jupyter_partition_timelimit'].keys())
 try:
     jupyter_timelimt = max(list(config['jupyter_partition_timelimit'].values()))
@@ -44,7 +51,10 @@ parser.add_argument('-N', '--nodes', type = int, default = 1, help = 'number of 
 if 'jupyter' in sys.argv:
     parser.add_argument('-p', '--partition', choices = jupyter_partition, default = jupyter_partition[0], help = 'partition name', metavar = '')
     parser.add_argument('-t', '--time', type = int, choices = range(1, jupyter_timelimt + 1), default = 2, help = f'number of hours (up to {jupyter_timelimt})', metavar = '')
-    parser.add_argument('-k', '--kernel', choices = ['r','python','julia'], default = 'python', help = 'Jupyter kernel (r/python/julia)', metavar = '')
+    if len(kernel_all) > 1:
+        parser.add_argument('-k', '--kernel', choices = kernel_all, default = 'python', help = f"Jupyter kernel ({', '.join(kernel_all)})", metavar = '')
+    if len(env) > 0:
+        parser.add_argument('-e', '--environment', choices = env, help = f"Python enviromnment(s) for {', '.join(env)}", metavar = '')
 else:
     parser.add_argument('-p', '--partition', choices = interactive_partition, default = interactive_partition[0], help = 'partition name', metavar = '')
     parser.add_argument('-t', '--time', type = int, choices = range(1, interactive_timelimt + 1), default = 2, help = f'number of hours (up to {interactive_timelimt})', metavar = '')
@@ -100,19 +110,21 @@ if args.interface == 'jupyter':
         print(f"Partition time limit. Max time for {args.partition} partition is {partition_timelimit} hours.")
         sys.exit(1)
     
-    if args.kernel == 'r':
-        kernel = 'r'
-        module = config['interface_module']['r-jupyter']
-    elif args.kernel == 'julia':
-        kernel = 'julia'
-        module = config['interface_module']['jupyter']
-    else:
-        kernel = 'py'
-        module = config['interface_module']['jupyter']
+    if args.kernel != 'python' and args.environment:
+        print('Select "python" kernel for using Python envs!')
+        sys.exit(1)
+    
+    kernel = args.kernel
+    module = config['kernel_module'][kernel]
+
+    if kernel == 'julia': module = config['kernel_module']['python']
+    
+    if args.environment:
+        module = config['env_module'][args.environment]
     
     ml_test = os.popen(f"if [ -z `module load {module} > /dev/null 2>&1 && which jupyter-lab 2> /dev/null` ]; then echo 'no-jupyter-found'; fi").read().strip()
     if ml_test == 'no-jupyter-found':
-        print(f"jupyter-lab not found!")
+        print(f"jupyter-lab command not found!")
         sys.exit(1)
     
     os.system(f"install -d ~/.jupyter/job")
@@ -133,7 +145,7 @@ if args.interface == 'jupyter':
         jb.write(f"""
 module load {module}
 if [ "{kernel}" == "julia" ]; then
-module load {config['interface_module']['julia']}
+module load {config['kernel_module']['julia']}
 julia -e 'using Pkg; Pkg.add("IJulia")'; fi
 jupyter-lab --no-browser --ip 0.0.0.0\n""")
     
