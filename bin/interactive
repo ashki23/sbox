@@ -13,28 +13,21 @@ import json
 import pathlib
 import argparse
 
-with open(f'{pathlib.Path(__file__).parent.absolute()}/../config') as cfg:
-    config = json.load(cfg)
-
-kernel_all = config['kernel_module']
-if len(config['kernel_module']['python']) == 0:
-    print("Python kernel for Jupyter not found in config kernel_module!")
-    sys.exit(1)
-
-env = config['env_module'].keys()
-
-jupyter_partition = list(config['jupyter_partition_timelimit'].keys())
 try:
-    jupyter_timelimt = max(list(config['jupyter_partition_timelimit'].values()))
-except ValueError:
-    print('Config file is empty! Update the config file based on the cluster partitions and timelimits.')
+    with open(f'{pathlib.Path(__file__).parent.absolute()}/../config') as cfg:
+        config = json.load(cfg)
+except Exception as err:
+    print('Invalid config file:', err)
     sys.exit(1)
+
+kernel_all = config['kernel_module'].keys()
+env = config['env_module'].keys()
 
 interactive_partition = list(config['interactive_partition_timelimit'].keys())
 try:
     interactive_timelimt = max(list(config['interactive_partition_timelimit'].values()))
-except ValueError:
-    print('Config file is empty! Update the config file based on the cluster partitions and timelimits.')
+except:
+    print('Invalid config file! Update interactive_partition_timelimit based on the cluster partitions and timelimits.')
     sys.exit(1)
 
 try:
@@ -49,6 +42,15 @@ parser.add_argument('-A', '--account', help = 'slurm account name or project id'
 parser.add_argument('-n', '--ntasks', type = int, default = 1, help = 'number of tasks (cpus)', metavar = '')
 parser.add_argument('-N', '--nodes', type = int, default = 1, help = 'number of nodes', metavar = '')
 if 'jupyter' in sys.argv:
+    jupyter_partition = list(config['jupyter_partition_timelimit'].keys())
+    try:
+        jupyter_timelimt = max(list(config['jupyter_partition_timelimit'].values()))
+    except:
+        print('Invalid config file! Update jupyter_partition_timelimit based on the cluster partitions and timelimits.')
+        sys.exit(1)
+    if 'python' not in config['kernel_module']:
+        print("Python kernel for Jupyter not found in config kernel_module!")
+        sys.exit(1)
     parser.add_argument('-p', '--partition', choices = jupyter_partition, default = jupyter_partition[0], help = 'partition name', metavar = '')
     parser.add_argument('-t', '--time', type = int, choices = range(1, jupyter_timelimt + 1), default = 2, help = f'number of hours (up to {jupyter_timelimt})', metavar = '')
     if len(kernel_all) > 1:

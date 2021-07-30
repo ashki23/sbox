@@ -14,8 +14,12 @@ import json
 import pathlib
 import argparse
 
-with open(f'{pathlib.Path(__file__).parent.absolute()}/../config') as cfg:
-    config = json.load(cfg)
+try:
+    with open(f'{pathlib.Path(__file__).parent.absolute()}/../config') as cfg:
+        config = json.load(cfg)
+except Exception as err:
+    print('Invalid config file:', err)
+    sys.exit(1)
 
 part_cpu = config['cpu_partition']
 part_gpu = config['gpu_partition']
@@ -172,16 +176,22 @@ if args.qos:
     """)
 
 if args.ncpu:
+    if len(part_cpu) == 0:
+        print('No CPU partition found in the config file!')
+        sys.exit(1)
     print(' Number of CPUs '.center(90,'-'))
     for p in part_cpu:
         idle = os.popen(f"""
         sinfo --partition {p} --Node --format %C | cut --delimiter '/' --fields 2,4 | tr '/' ' ' | awk '{{ sum1 += $1; sum2 += $2 }} END {{ print sum1, sum2 }}'
         """).read().strip().split()
         if int(idle[1]) > 0:
-            print('Partition ',p,' has ',idle[0],' cpus available out of ',idle[1],' (',round((int(idle[0])/int(idle[1]))*100),'%)',sep='')
+            print('Partition ',p,' has ',idle[0],' cpus available out of ',idle[1],' (',round((int(idle[0])/int(idle[1]))*100),'%)', sep ='')
     print()
 
 if args.ngpu:
+    if len(part_gpu) == 0:
+        print('No GPU partition found in the config file!')
+        sys.exit(1)
     print(' Number of GPUs '.center(90,'-'))
     for g in part_gpu:
         unavail = os.popen(f"""
@@ -201,10 +211,13 @@ if args.ngpu:
             total = 0
         
         avail = total - unavail
-        print('Partition ',g,' has ',avail,' gpus available out of ',total,' (',round((avail/total)*100),'%)',sep='')
+        print('Partition ',g,' has ',avail,' gpus available out of ',total,' (',round((avail/total)*100),'%)', sep = '')
     print()
 
 if args.gpu:
+    if len(part_gpu) == 0:
+        print('No GPU partition found in the config file!')
+        sys.exit(1)
     for g in part_gpu:
         print(f" Gpu Resources in {g} Partition ".center(90,'-'))
         os.system(f"""
@@ -257,6 +270,9 @@ if args.whodat2:
 
 if args.quota:
     disk_quota = config['disk_quota_paths']
+    if len(disk_quota) == 0:
+        print('No disk found in the config file!')
+        sys.exit(1)    
     gpn = os.popen(f"""
     echo $(groups {args.user} | grep -Po "(?<=: ).*")
     """).read().strip().split()
