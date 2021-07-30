@@ -22,9 +22,14 @@
 	"Serial": "seriallong",
 	"Dtn": "dtn"
     },
-    "interface_module": {
-        "r-jupyter": "r-essentials",
-        "jupyter": "anaconda",
+    "kernel_module": {
+        "python": "anaconda",
+        "r": "r-essentials",
         "julia": "julia"
+    },
+    "env_module": {
+	"tensorflow-v1.9": "tensorflow/1.9.0",
+	"tensorflow": "tensorflow",
+	"pytorch": "pytorch"
     }
 }

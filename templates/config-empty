@@ -5,9 +5,6 @@
     "interactive_partition_timelimit": {},
     "jupyter_partition_timelimit": {},
     "partition_qos": {},
-    "interface_module": {
-        "r-jupyter": "",
-        "jupyter": "",
-        "julia": ""
-  }
+    "kernel_module": {},
+    "env_module": {}
 }
