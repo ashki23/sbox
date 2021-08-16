@@ -1,6 +1,6 @@
 # Sbox
 
-Sbox is a toolbox for Slurm that provides information about users' accounts and jobs as well as information about the cluster resources. Sbox also can help Slurm admins to collect users' information by users ID and jobs ID. Interactive command uses Slurm `srun` and `sbatch` commands  to request resources interactively including running a Jupyter server on the cluster.
+Sbox is a toolbox for Slurm that provides information about users' accounts and jobs as well as information about the cluster resources. Sbox also can help Slurm admins to collect users' information by user and job IDs. Interactive command uses Slurm `srun` and `sbatch` commands  to request resources interactively including running a Jupyter server on the cluster.
 
 ## Commands
 
@@ -16,10 +16,10 @@ Sbox is a toolbox for Slurm that provides information about users' accounts and 
 - `-h, --help`: Show the help message and exit.
 - `-a, --account`: Return user's Slurm accounts by using Slurm `sacctmgr`. If the cluster does not use Slurm for users' account management, it returns empty output.
 - `-f, --fairshare`: Return users' fairshare by using Slurm `sshare` command. If the cluster does not follow a fairshare model, it returns empty output.
-- `-g, --group`: Return user's Posix groups by using Unix `groups` command.
+- `-g, --group`: Return user's posix groups by using Unix `groups` command.
 - `-q, --queue`: Return user's jobs in the Slurm queue by Slurm using `squeue` command.
 - `-j, --job`: Show a running/pending job info by using Slurm `scontrol` command. It requires a valid job ID as argument.
-- `-c, --cpu`: Return computational resources including number of cores and amount of memory on each node. It uses Slurm `sjstat` command. 
+- `-c, --cpu`: Return computational resources including number of cores and amount of memory on each node. It uses Slurm `sjstat` command.
 - `-p, --partition`: Show cluster partitions by using Slurm `sinfo` command.
 - `-u, --user`: Store a user ID. By default it uses `$USER` as user ID for any query that needs a user ID. It can be used with other options to find the information for other users.
 - `-v, --version`: Show program's version number and exit.
@@ -28,7 +28,7 @@ Sbox is a toolbox for Slurm that provides information about users' accounts and 
 - `--pending`: Return user's pending jobs by using Slurm `squeue` command.
 - `--running`: Return user's running jobs by using Slurm `squeue` command.
 - `--qos`: Show user's quality of services (QOS) and a list of available QOS in the cluster. It uses Slurm `sacctmgr show assoc` command and return empty output if the cluster does not use Slurm for users' account management.
-- `--quota`: Return user's disk quotas. It uses LFS `lfs quota` command for LFS systems and Unix `df` command for NFS systems. It returns pooled size of the disk if the cluster does not have user/group storage accounts.
+- `--quota`: Return user's disk quotas. It uses `lfs quota` command for LFS systems and Unix `df` command for NFS systems. It returns pooled size of the disk if the cluster does not have user/group storage accounts.
 - `--ncpu`: Show number of available cpus on the cluster using Slurm `sinfo` command.
 - `--ncgu`: Show number of available gpus on the cluster using Slurm `squeue` and `sinfo` commands.
 - `--gpu`: Show gpu resources including gpu cards' name and numbers using Slurm `sinfo` command.
@@ -122,17 +122,17 @@ Fine jobs in the queue:
 
 ### Command line options
 
-- `-h, --help`: Show this help message and exit
-- `-A, --account`: Slurm account name or project id
-- `-n, --ntasks`: Number of tasks (cpus)
-- `-N, --nodes`: Number of nodes
-- `-p, --partition`: Partition name
-- `-t, --time`: Number of hours (based on the partitions timelimit)
-- `-l, --license`: Add a license to an interactive session
-- `-m, --mem`: Amount of memory per GB
-- `-g, --gpu`: Number of gpus
+- `-h, --help`: Show this help message and exit.
+- `-A, --account`: Slurm account name or project id.
+- `-n, --ntasks`: Number of tasks (cpus).
+- `-N, --nodes`: Number of nodes.
+- `-p, --partition`: Partition name.
+- `-t, --time`: Number of hours based on the partitions timelimit.
+- `-l, --license`: Add a license to an interactive session.
+- `-m, --mem`: Amount of memory per GB.
+- `-g, --gpu`: Number of gpus.
 - `-k, --kernel`: Jupyter kernel for python, r, julia. The default kernel is python.
-- `-e, --environment`: Python environment(s) for a JupyterLab session
+- `-e, --environment`: Python environment(s) for a JupyterLab session.
 
 **Examples**
 
@@ -211,14 +211,14 @@ Starting Jupyter server ...
 
 ## Quick install
 
-- Download and extract the [latest Sbox release](https://github.com/ashki23/sbox/releases/latest)
-- Update the `./config` file based on the cluster information. Review "Configuration" to learn more. Find a config example under `./templates/config-rcss` 
-- To access a JupyerLab session, install Anaconda and create the required virtual environments and modulefiles. Review "Requirements" to learn more
-- Place a modulefile for Sbox under `$MODULEPATH/sbox` directory. As a template you may use `./templates/1.1.lua`
+- Download and extract the [latest Sbox release](https://github.com/ashki23/sbox/releases/latest).
+- Update the `./config` file based on the cluster information. Review "Configuration" to learn more.
+- To access a JupyerLab session, install Anaconda and create the required virtual environments and modulefiles. Review "Requirements" to learn more.
+- Place a modulefile for Sbox under `$MODULEPATH/sbox` directory. You can find the Sbox template modulefile in `./templates/1.2.lua`.
 
 ## Requirements
 
-Sbox requires Slurm and Python >= 3.6.8. The `interactive jupyter` command requires Anaconda and an environment module system (e.g. [Lmod](https://lmod.readthedocs.io/en/latest/)) in addition to Slurm and Python. To use R and Julia kernels in `interactive jupyter`, we need R and irkernel as well as Julia to be installed. 
+Sbox requires Slurm and Python >= 3.6.8. The `interactive jupyter` command requires Anaconda and an environment module system (e.g. [Lmod](https://lmod.readthedocs.io/en/latest/)) in addition to Slurm and Python. To use R and Julia in JupyterLab sessions, we need R and irkernel as well as Julia to be installed.
 
 Note that Sbox options might require some other Unix commands. Review the options requirement under the command line options.
 
@@ -239,6 +239,7 @@ To load  Anaconda by `modeule load` command, create the following modeulefile un
 
 ```lua
 -- -*- lua -*-
+
 whatis([[Name : anaconda]])
 whatis([[Version : <year.month>]])
 whatis([[Target : x86_64]])
@@ -259,7 +260,7 @@ prepend_path("PKG_CONFIG_PATH", this_root .. "/lib/pkgconfig", ":")
 setenv("ANACONDA_ROOT", this_root)
 ```
 
-Or the following tcl modulefile under `$MODULEPATH/anaconda/<year.month>`:
+Or adding the following tcl modulefile under `$MODULEPATH/anaconda/<year.month>`:
 
 ```tcl
 #%Module1.0
@@ -307,6 +308,7 @@ The following modulefile should be added to `$MODULEPATH/r-essentials/<R version
 
 ```lua
 -- -*- lua -*-
+
 whatis([[Name : r-essentials]])
 whatis([[Version : <R version>]])
 whatis([[Target : x86_64]])
@@ -327,12 +329,12 @@ prepend_path("PKG_CONFIG_PATH", this_root .. "/lib/pkgconfig", ":")
 setenv("ANACONDA_ROOT", this_root)
 ```
 
-Or a tcl modulefile similar to the above tcl template for Anaconda.
+Or adding a tcl modulefile similar to the above tcl template for Anaconda.
 
 
 ### Julia kernel
 
-The `interactive jupyter -k julia` command provides Julia from a JupyterLab notebook. Julia can be installed from [Spack](https://spack.io/), [source](https://julialang.org/downloads/) or [Anaconda](https://anaconda.org/conda-forge/julia). The following shows how to install Julia from an Anaconda (Note that if Julia have been installed on the cluster, you can skip this section and use the available Julia module instead).
+The `interactive jupyter -k julia` command provides Julia from a JupyterLab notebook. Julia can be installed from [Spack](https://spack.io/), [source](https://julialang.org/downloads/) or [Anaconda](https://anaconda.org/conda-forge/julia). The following shows how to install Julia from Anaconda (Note that if Julia have been installed on the cluster, you can skip this section and use the available Julia module instead).
 
 ```bash
 cd /<cluster software path>/anaconda/<year.month>
@@ -346,6 +348,7 @@ The following modulefile should be added to `$MODULEPATH/julia/<version>.lua`:
 
 ```lua
 -- -*- lua -*-
+
 whatis([[Name : julia]])
 whatis([[Version : <version>]])
 whatis([[Target : x86_64]])
@@ -366,9 +369,9 @@ prepend_path("PKG_CONFIG_PATH", this_root .. "/lib/pkgconfig", ":")
 setenv("ANACONDA_ROOT", this_root)
 ```
 
-Or a tcl modulefile similar to the above tcl template for Anaconda.
+Or adding a tcl modulefile similar to the above tcl template for Anaconda.
 
-Note that the first time users run `interactive jupyter -k julia`, Julia Jupyter kernal (IJulia) will be installed under `~/.julia`.
+Note that the first time that users run `interactive jupyter -k julia`, Julia Jupyter kernal (IJulia) will be installed under `~/.julia`.
 
 ### On demand Python pakages
 
@@ -395,6 +398,7 @@ For each env, we need to add a modulefile to `$MODULEPATH/<env name>/<version>.l
 
 ```lua
 -- -*- lua -*-
+
 whatis([[Name : tensorflow]])
 whatis([[Version : <version>]])
 whatis([[Target : x86_64]])
@@ -415,7 +419,7 @@ prepend_path("PKG_CONFIG_PATH", this_root .. "/lib/pkgconfig", ":")
 setenv("ANACONDA_ROOT", this_root)
 ```
 
-Or a tcl modulefile similar to the above tcl template for Anaconda.
+Or adding a tcl modulefile similar to the above tcl template for Anaconda.
 
 
 ## Configuration
@@ -438,14 +442,14 @@ The `sbox` and `interactive` commands are reading the required information from 
 
 The config file includes:
 
-- `disk_quota_paths`: A list of pathes to the disk for finding users quotas. By default the first input is considered as the users' home path
-- `cpu_partition`: A list of computational partitions
-- `gpu_partition`: A list of GPU partitions
-- `interactive_partition_timelimit`: A dictionary of interactive partitions (i.e. users should access by `srun`) and their time limits (hour)
-- `jupyter_partition_timelimit`: A dictionary of computational/gpu partitions that users can run Jupter servers interactively and their time limits (hour)
-- `partition_qos`: A dictionary of partitions and the corresponding quality of services
-- `kernel_module`: A dictionary of kernels and the corresponding modules
-- `env_module`: A dictionary of Python virtual environments and the corresponding modules
+- `disk_quota_paths`: A list of paths to the disk for finding users quotas. By default the first input is considered as the users' home path.
+- `cpu_partition`: A list of computational partitions.
+- `gpu_partition`: A list of GPU partitions.
+- `interactive_partition_timelimit`: A dictionary of interactive partitions (i.e. users should access by `srun`) and their time limits (hour). The first input is considered as the default partition.
+- `jupyter_partition_timelimit`: A dictionary of computational/gpu partitions that users can run Jupter servers interactively and their time limits (hour). The first input is considered as the default partition.
+- `partition_qos`: A dictionary of partitions and the corresponding quality of services.
+- `kernel_module`: A dictionary of kernels and the corresponding modules. A Python kernel is required (review the Requirments).
+- `env_module`: A dictionary of Python virtual environments and the corresponding modules.
 
 For example:
 

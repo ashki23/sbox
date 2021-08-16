@@ -50,7 +50,7 @@ Command line options
    available QOS in the cluster. It uses Slurm ``sacctmgr show assoc``
    command and return empty output if the cluster does not use Slurm for
    users’ account management.
--  ``--quota``: Return user’s disk quotas. It uses LFS ``lfs quota``
+-  ``--quota``: Return user’s disk quotas. It uses ``lfs quota``
    command for LFS systems and Unix ``df`` command for NFS systems. It
    returns pooled size of the disk if the cluster does not have
    user/group storage accounts.
@@ -161,17 +161,17 @@ JupyterLab.
 Command line options
 --------------------
 
--  ``-h, --help``: Show this help message and exit
--  ``-A, --account``: Slurm account name or project id
--  ``-n, --ntasks``: Number of tasks (cpus)
--  ``-N, --nodes``: Number of nodes
--  ``-p, --partition``: Partition name
--  ``-t, --time``: Number of hours (based on the partitions timelimit)
--  ``-l, --license``: Add a license to an interactive session
--  ``-m, --mem``: Amount of memory per GB
--  ``-g, --gpu``: Number of gpus
+-  ``-h, --help``: Show this help message and exit.
+-  ``-A, --account``: Slurm account name or project id.
+-  ``-n, --ntasks``: Number of tasks (cpus).
+-  ``-N, --nodes``: Number of nodes.
+-  ``-p, --partition``: Partition name.
+-  ``-t, --time``: Number of hours based on the partitions time limits.
+-  ``-l, --license``: Add a license to an interactive session.
+-  ``-m, --mem``: Amount of memory per GB.
+-  ``-g, --gpu``: Number of gpus.
 -  ``-k, --kernel``: Jupyter kernel for python, r, julia. The default kernel is python.
--  ``-e, --environment``: Python environment(s) for a JupyterLab session
+-  ``-e, --environment``: Python environment(s) for a JupyterLab session.
 
 **Examples**
 

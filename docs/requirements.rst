@@ -1,15 +1,12 @@
 Quick install
 =============
 
--  Download and extract the `latest Sbox release <https://github.com/ashki23/sbox/releases/latest>`__
+-  Download and extract the `latest Sbox release <https://github.com/ashki23/sbox/releases/latest>`__.
 -  Update the ``./config`` file based on the cluster information. Review
-   `“Configuration” <https://sbox.readthedocs.io/en/latest/requirements.html#configuration>`__ to learn more. Find a config example under
-   ``./templates/config-rcss``
--  To access a JupyerLab session, install Anaconda and create
-   the required virtual environments and modulefiles. Review
-   `“Requirements” <https://sbox.readthedocs.io/en/latest/requirements.html#requirements>`__ to learn more.
--  Place a modulefile for Sbox under ``$MODULEPATH/sbox`` directory. As
-   a template you may use ``./templates/1.1.lua``
+   `Configuration <https://sbox.readthedocs.io/en/latest/requirements.html#configuration>`__ to learn more.
+-  To access a JupyerLab session, install Anaconda and create the required virtual environments and modulefiles. Review
+   `Requirements <https://sbox.readthedocs.io/en/latest/requirements.html#requirements>`__ to learn more.
+-  Place a modulefile for Sbox under ``$MODULEPATH/sbox``. You can find the Sbox template modulefile in `here <https://github.com/ashki23/sbox/blob/main/templates/1.2.lua>`__.
 
 Requirements
 ============
@@ -17,8 +14,7 @@ Requirements
 Sbox requires Slurm and Python >= 3.6.8. The ``interactive jupyter``
 command requires Anaconda and an environment module system
 (e.g. `Lmod <https://lmod.readthedocs.io/en/latest/>`__) in addition to
-Slurm and Python. To use R and Julia kernels in ``interactive jupyter``,
-we need R and irkernel as well as Julia to be installed.
+Slurm and Python. To use R and Julia in JupyterLab sessions, we need R and irkernel as well as Julia to be installed.
 
 Note that Sbox options might require some other Unix commands. Review
 the options requirement under the `command line options <https://sbox.readthedocs.io/en/latest/sbox.html#command-line-options>`__.
@@ -49,6 +45,7 @@ modeulefile under ``$MODULEPATH/anaconda/<year.month>.lua``:
 .. code:: lua
 
    -- -*- lua -*-
+
    whatis([[Name : anaconda]])
    whatis([[Version : <year.month>]])
    whatis([[Target : x86_64]])
@@ -68,7 +65,7 @@ modeulefile under ``$MODULEPATH/anaconda/<year.month>.lua``:
    prepend_path("PKG_CONFIG_PATH", this_root .. "/lib/pkgconfig", ":")
    setenv("ANACONDA_ROOT", this_root)
 
-Or the following tcl modulefile under
+Or adding the following tcl modulefile under
 ``$MODULEPATH/anaconda/<year.month>``:
 
 .. code::
@@ -127,6 +124,7 @@ env:
 .. code:: lua
 
    -- -*- lua -*-
+
    whatis([[Name : r-essentials]])
    whatis([[Version : <R version>]])
    whatis([[Target : x86_64]])
@@ -146,7 +144,7 @@ env:
    prepend_path("PKG_CONFIG_PATH", this_root .. "/lib/pkgconfig", ":")
    setenv("RESSENTIALS_ROOT", this_root)
 
-Or a tcl modulefile similar to the above tcl template for Anaconda.
+Or adding a tcl modulefile similar to the above tcl template for Anaconda.
 
 Julia kernel
 ------------
@@ -156,7 +154,7 @@ JupyterLab notebook. Julia can be installed from
 `Spack <https://spack.io/>`__,
 `source <https://julialang.org/downloads/>`__ or
 `Anaconda <https://anaconda.org/conda-forge/julia>`__. The following
-shows how to install Julia from an Anaconda (Note that if Julia have
+shows how to install Julia from Anaconda (Note that if Julia have
 been installed on the cluster, you can skip this section and use the
 available Julia module instead).
 
@@ -175,6 +173,7 @@ The following modulefile should be added to
 .. code:: lua
 
    -- -*- lua -*-
+
    whatis([[Name : julia]])
    whatis([[Version : <version>]])
    whatis([[Target : x86_64]])
@@ -194,9 +193,9 @@ The following modulefile should be added to
    prepend_path("PKG_CONFIG_PATH", this_root .. "/lib/pkgconfig", ":")
    setenv("JULIA_ROOT", this_root)
 
-Or a tcl modulefile similar to the above tcl template for Anaconda.
+Or adding a tcl modulefile similar to the above tcl template for Anaconda.
 
-Note that the first time users run ``interactive jupyter -k julia``,
+Note that the first time that users run ``interactive jupyter -k julia``,
 Julia Jupyter kernal (IJulia) will be installed under ``~/.julia``.
 
 On demand Python pakages
@@ -231,6 +230,7 @@ For each env, we need to add a modulefile to
 .. code:: lua
 
    -- -*- lua -*-
+
    whatis([[Name : tensorflow]])
    whatis([[Version : <version>]])
    whatis([[Target : x86_64]])
@@ -250,7 +250,7 @@ For each env, we need to add a modulefile to
    prepend_path("PKG_CONFIG_PATH", this_root .. "/lib/pkgconfig", ":")
    setenv("TENSORFLOW_ROOT", this_root)
 
-Or a tcl modulefile similar to the above tcl template for Anaconda.
+Or adding a tcl modulefile similar to the above tcl template for Anaconda.
 
 configuration
 =============
@@ -274,23 +274,21 @@ information from the below JSON config file.
 
 The config file includes:
 
--  ``disk_quota_paths``: A list of pathes to the disk for finding users
-   quotas. By default the first input is considered as the users’ home
-   path
--  ``cpu_partition``: A list of computational partitions
--  ``gpu_partition``: A list of GPU partitions
+-  ``disk_quota_paths``: A list of paths to the disks for finding users
+   quotas. By default the first input is considered as the users’ home path.
+-  ``cpu_partition``: A list of computational partitions.
+-  ``gpu_partition``: A list of GPU partitions.
 -  ``interactive_partition_timelimit``: A dictionary of interactive
    partitions (i.e. users should access by ``srun``) and their time
-   limits (hour)
+   limits (hour). The first input is considered as the default partition.
 -  ``jupyter_partition_timelimit``: A dictionary of computational/gpu
    partitions that users can run Jupter servers interactively and their
-   time limits (hour)
+   time limits (hour). The first input is considered as the default partition.
 -  ``partition_qos``: A dictionary of partitions and the corresponding
-   quality of services
--  ``kernel_module``: A dictionary of kernels and the corresponding
-   modules
--  ``env_module``: A dictionary of Python virtual environments and the
-   corresponding modules
+   quality of services.
+-  ``kernel_module``: A dictionary of kernels and the corresponding modules.
+   A Python kernel is required (review `here <https://sbox.readthedocs.io/en/latest/requirements.html#python-kernel-anaconda>`__).
+-  ``env_module``: A dictionary of Python virtual environments and the corresponding modules.
 
 For example:
 

@@ -25,47 +25,37 @@ ssh-agent).
 Show the help message and exit.
 .TP
 .B -a, --account
-Return users Slurm accounts by using Slurm sacctmgr.
-qIf the cluster does not use Slurm for users account management, it returns empty output.
+Return users Slurm accounts by using Slurm sacctmgr. If the cluster does not use Slurm for users account management, it returns empty output.
 .TP
 .B -f, --fairshare 
-Return users fairshare by using Slurm sshare command.
-If the cluster does not follow a fairshare model, it returns empty output.
+Return users fairshare by using Slurm sshare command. If the cluster does not follow a fairshare model, it returns empty output.
 .TP
 .B -g, --group 
-Return users Posix groups by using Unix groups command.
+Return users posix groups by using Unix groups command.
 .TP
 .B -q, --queue 
 Return users jobs in the Slurm queue by Slurm using squeue command.
 .TP
 .B -j, --job 
-Show a running/pending job info by using Slurm scontrol command.
-It requires a valid job ID as argument.
+Show a running/pending job info by using Slurm scontrol command. It requires a valid job ID as argument.
 .TP
 .B -c, --cpu 
-Return computational resources including number of cores and amount of memory on each node.
-It uses Slurm sjstat command.
+Return computational resources including number of cores and amount of memory on each node. It uses Slurm sjstat command.
 .TP
 .B -p, --partition 
 Show cluster partitions by using Slurm sinfo command.
 .TP
 .B -u, --user 
-Store a user ID. By default it uses $USER as user ID for any query that needs a
-user ID. It can be used with other options to find the information for other users.
+Store a user ID. By default it uses $USER as user ID for any query that needs a user ID. It can be used with other options to find the information for other users.
 .TP
 .B -v, --version 
 Show programs version number and exit.
 .TP
 .B --eff
-Show efficiency of a job. It requires a valid job ID as argument.
-It uses Slurm seff command for completed/finished jobs and
-Unix top command for a running job.
+Show efficiency of a job. It requires a valid job ID as argument. It uses Slurm seff command for completed/finished jobs and Unix top command for a running job.
 .TP
 .B --history 
-Return jobs history for last day, week, month or
-year. It requires one of the day/week/month/year options as an argument.
-It uses Slurm sacct command and return empty output if the
-cluster does not use Slurm for users account management.
+Return jobs history for last day, week, month or year. It requires one of the day/week/month/year options as an argument. It uses Slurm sacct command and return empty output if the cluster does not use Slurm for users account management.
 .TP
 .B --pending 
 Return users pending jobs by using Slurm squeue command.
@@ -74,46 +64,31 @@ Return users pending jobs by using Slurm squeue command.
 Return users running jobs by using Slurm squeue command.
 .TP
 .B --qos 
-Show users quality of services (QOS) and a list of
-available QOS in the cluster. It uses Slurm sacctmgr show assoc command and return empty
-output if the cluster does not use Slurm for users account
-management.
+Show users quality of services (QOS) and a list of available QOS in the cluster. It uses Slurm sacctmgr show assoc command and return empty output if the cluster does not use Slurm for users account management.
 .TP
 .B --quota 
-Return users disk quotas. It uses LFS lfs quota command for LFS systems and Unix
-df command for NFS systems. It returns pooled size of the disk if the cluster does not have
-user/group storage accounts.
+Return users disk quotas. It uses lfs quota command for LFS systems and Unix df command for NFS systems. It returns pooled size of the disk if the cluster does not have user/group storage accounts.
 .TP
 .B --ncpu 
-Show number of available cpus on the cluster using
-Slurm sinfo command.
+Show number of available cpus on the cluster using Slurm sinfo command.
 .TP
 .B --ncgu 
-Show number of available gpus on the cluster using
-Slurm squeue and sinfo commands.
+Show number of available gpus on the cluster using Slurm squeue and sinfo commands.
 .TP
 .B --gpu 
-Show gpu resources including gpu cards name and
-numbers using Slurm sinfo command.
+Show gpu resources including gpu cards name and numbers using Slurm sinfo command.
 .TP
 .B --license 
-Show available license servers using Slurm
-scontrol command.
+Show available license servers using Slurm scontrol command.
 .TP
 .B --reserve 
-Show Slurm reservations using Slurm
-scontrol command.
+Show Slurm reservations using Slurm scontrol command.
 .TP
 .B --topusage 
-Show top usage users using Slurm sreport
-command.
+Show top usage users using Slurm sreport command.
 .TP
 .B --agent 
-Start, stop and list users ssh-agents on the
-current host.
-It requires one of the start/stop/list options as an argument.
-Use ssh -o StrictHostKeyChecking=no to disable asking for host
-key acceptances.
+Start, stop and list users ssh-agents on the current host. It requires one of the start/stop/list options as an argument. Use ssh -o StrictHostKeyChecking=no to disable asking for host key acceptances.
 .PP
 \f[B]Examples
 .PP

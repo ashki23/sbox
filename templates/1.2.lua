@@ -14,7 +14,7 @@ whatis("URL: https://sbox.readthedocs.io/")
 whatis("Description: Small toolbox for Slurm")
 
 -- Create environment variables (UPDATE THE PATH)
-local this_root   = "/cluster/software/path/sbox/1.2"
+local this_root = "/cluster/software/path/sbox/1.2"
 
 prepend_path("PATH", this_root .. "/bin", ":")
 prepend_path("MANPATH", this_root .. "/share/man", ":")
