@@ -165,6 +165,7 @@ rm ~/.jupyter/job/{kernel}-*.out 2> /dev/null
 jid=$(sbatch --parsable ~/.jupyter/job/{kernel}-jupyter-job) || exit
 if [ -z `echo $jid` ]; then exit; fi
 echo "{announce} ..."
+sleep 3
 echo "Starting Jupyter server (it might take about a couple minutes) ..."
 if [ "{kernel}" == "julia" ]; then echo "Installing Ijulia ... "; fi
 myn=0

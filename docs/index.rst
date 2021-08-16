@@ -3,7 +3,7 @@ Sbox
 
 Sbox is a toolbox for Slurm that provides information about users' accounts and jobs as well as information about the cluster resources. Sbox also can help Slurm admins to collect users' information by users ID and jobs ID. Interactive command uses Slurm ``srun`` and ``sbatch`` commands to request resources interactively including running a Jupyter server on the cluster.
 
-.. note:: You can download the latest release of Sbox from: `https://github.com/ashki23/sbox/releases/latest <https://github.com/ashki23/sbox/releases/latest>`_.
+.. note:: You can download the latest release of Sbox from `https://github.com/ashki23/sbox/releases/latest <https://github.com/ashki23/sbox/releases/latest>`_ and find the codes or fork the repository on `https://github.com/ashki23/sbox <https://github.com/ashki23/sbox>`__.
 
 Features
 --------

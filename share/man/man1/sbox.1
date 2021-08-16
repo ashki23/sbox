@@ -1,0 +1,209 @@
+.TH SBOX "1" "August 2021" "SBOX 1.2"
+.SH NAME
+sbox \- a small toolbox for Slurm
+.SH SYNOPSIS
+.B sbox
+[\fB-h\fR] [\fB-a\fR] [\fB-f\fR] [\fB-g\fR] [\fB-q\fR] [\fB-j\fR JOBID] [\fB-c\fR] [\fB-p\fR] [\fB-u\fR UID] [\fB-v\fR]
+[\fB--eff\fR JOBID] [\fB--history\fR {day,week,month,year}] [\fB--pending\fR]
+[\fB--running\fR] [\fB--qos\fR] [\fB--quota\fR] [\fB--ncpu\fR] [\fB--ngpu\fR] [\fB--gpu\fR]
+[\fB--license\fR] [\fB--reserve\fR] [\fB--topusage\fR] [\fB--whodat\fR UID]
+[\fB--whodat2\fR UNAME] [\fB--agent\fR {start,stop,list}]
+.br
+.SH DESCRIPTION
+sbox command includes various Slurm commands at one place.
+Users can use different options to find the information about the
+cluster and their accounts and activities.
+Beyond the Slurm commands, sbox provides some Unix features
+including users groups, disk quotas and starting ssh agents.
+The ssh-agent lets users communicate with clients outside the cluster
+such as GitHub and GitLab or with other nodes within the cluster via ssh
+without asking for the passphrase (you need the passphrase to start the
+ssh-agent).
+.SH COMMAND LINE OPTIONS
+.TP
+.B -h, --help
+Show the help message and exit.
+.TP
+.B -a, --account
+Return users Slurm accounts by using Slurm sacctmgr.
+qIf the cluster does not use Slurm for users account management, it returns empty output.
+.TP
+.B -f, --fairshare 
+Return users fairshare by using Slurm sshare command.
+If the cluster does not follow a fairshare model, it returns empty output.
+.TP
+.B -g, --group 
+Return users Posix groups by using Unix groups command.
+.TP
+.B -q, --queue 
+Return users jobs in the Slurm queue by Slurm using squeue command.
+.TP
+.B -j, --job 
+Show a running/pending job info by using Slurm scontrol command.
+It requires a valid job ID as argument.
+.TP
+.B -c, --cpu 
+Return computational resources including number of cores and amount of memory on each node.
+It uses Slurm sjstat command.
+.TP
+.B -p, --partition 
+Show cluster partitions by using Slurm sinfo command.
+.TP
+.B -u, --user 
+Store a user ID. By default it uses $USER as user ID for any query that needs a
+user ID. It can be used with other options to find the information for other users.
+.TP
+.B -v, --version 
+Show programs version number and exit.
+.TP
+.B --eff
+Show efficiency of a job. It requires a valid job ID as argument.
+It uses Slurm seff command for completed/finished jobs and
+Unix top command for a running job.
+.TP
+.B --history 
+Return jobs history for last day, week, month or
+year. It requires one of the day/week/month/year options as an argument.
+It uses Slurm sacct command and return empty output if the
+cluster does not use Slurm for users account management.
+.TP
+.B --pending 
+Return users pending jobs by using Slurm squeue command.
+.TP
+.B --running 
+Return users running jobs by using Slurm squeue command.
+.TP
+.B --qos 
+Show users quality of services (QOS) and a list of
+available QOS in the cluster. It uses Slurm sacctmgr show assoc command and return empty
+output if the cluster does not use Slurm for users account
+management.
+.TP
+.B --quota 
+Return users disk quotas. It uses LFS lfs quota command for LFS systems and Unix
+df command for NFS systems. It returns pooled size of the disk if the cluster does not have
+user/group storage accounts.
+.TP
+.B --ncpu 
+Show number of available cpus on the cluster using
+Slurm sinfo command.
+.TP
+.B --ncgu 
+Show number of available gpus on the cluster using
+Slurm squeue and sinfo commands.
+.TP
+.B --gpu 
+Show gpu resources including gpu cards name and
+numbers using Slurm sinfo command.
+.TP
+.B --license 
+Show available license servers using Slurm
+scontrol command.
+.TP
+.B --reserve 
+Show Slurm reservations using Slurm
+scontrol command.
+.TP
+.B --topusage 
+Show top usage users using Slurm sreport
+command.
+.TP
+.B --agent 
+Start, stop and list users ssh-agents on the
+current host.
+It requires one of the start/stop/list options as an argument.
+Use ssh -o StrictHostKeyChecking=no to disable asking for host
+key acceptances.
+.PP
+\f[B]Examples
+.PP
+See jobs histoty
+.IP
+.nf
+[user\[at]lewis4-r630-login-node675 \[ti]]$ module load sbox
+[user\[at]lewis4-r630-login-node675 \[ti]]$ sbox --hist day
+-------------------------------------------------------------------------------- Jobs History - Last Day ---------------------------------------------------------------------
+     JobID   User Account      State Partition     QOS NCPU NNod ReqMem              Submit   Reserved               Start    Elapsed                 End             NodeList
+---------- ------ ------- ---------- --------- ------- ---- ---- ------ ------------------- ---------- ------------------- ---------- ------------------- --------------------
+  23126125  user  general  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:05   00:00:00 2021-07-28T01:25:05   00:00:03 2021-07-28T01:25:08 lewis4-c8k-hpc2-nod+
+  23126126  user  general  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:13   00:00:00 2021-07-28T01:25:13   00:00:03 2021-07-28T01:25:16 lewis4-c8k-hpc2-nod+
+  23126127  user  general  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:20   00:00:00 2021-07-28T01:25:20   00:00:08 2021-07-28T01:25:28 lewis4-c8k-hpc2-nod+
+  23126128  user  genera+  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:49   00:00:00 2021-07-28T01:25:49   00:00:03 2021-07-28T01:25:52 lewis4-c8k-hpc2-nod+
+  23126129  user  genera+  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:26:05   00:00:00 2021-07-28T01:26:05   00:00:06 2021-07-28T01:26:11 lewis4-c8k-hpc2-nod+
+  23126130  user  genera+  COMPLETED       Gpu  normal    1    1    2Gn 2021-07-28T01:26:38   00:00:02 2021-07-28T01:26:40   00:00:11 2021-07-28T01:26:51 lewis4-z10pg-gpu3-n+
+  23126131  user  genera+ CANCELLED+       Gpu  normal    1    1    2Gn 2021-07-28T01:27:43   00:00:01 2021-07-28T01:27:44   00:01:03 2021-07-28T01:28:47 lewis4-z10pg-gpu3-n+
+.fi
+.PP
+Find a jobs efficiency:
+.IP
+.nf
+[user\[at]lewis4-r630-login-node675 \[ti]]$ sbox --eff 23148125
+------------------------------------- Job Efficiency -------------------------------------
+Job ID: 23126131
+Cluster: lewis4
+User/Group: user/user
+State: CANCELLED (exit code 0)
+Cores: 1
+CPU Utilized: 00:00:01
+CPU Efficiency: 1.59% of 00:01:03 core-walltime
+Memory Utilized: 45.80 MB
+Memory Efficiency: 2.24% of 2.00 GB
+.fi
+.PP
+Find accounts, fairshares, and groups:
+.IP
+.nf
+[user\[at]lewis4-r630-login-node675 \[ti]]$ sbox -afg
+---------------------------------------- Accounts ----------------------------------------
+rcss-gpu  root  general-gpu  rcss  general
+
+--------------------------------------- Fairshare ----------------------------------------
+             Account       User  RawShares  NormShares    RawUsage  EffectvUsage  FairShare 
+-------------------- ---------- ---------- ----------- ----------- ------------- ---------- 
+root                       user     parent    1.000000           0      0.000000   1.000000 
+general-gpu                user          1    0.000005        3942      0.000016   0.098089 
+rcss                       user          1    0.001391        1327      0.001147   0.564645 
+general                    user          1    0.000096     3196356      0.000243   0.174309 
+rcss-gpu                   user          1    0.000181           0      0.000000   0.999976 
+
+----------------------------------------- Groups -----------------------------------------
+user : user rcss gaussian biocompute rcsslab-group rcss-maintenance rcss-cie software-cache
+.fi
+.PP
+Find disk quotas:
+.IP
+.nf
+[user\[at]lewis4-r630-login-node675 \[ti]]$ sbox --quo
+------------------------------------- user /home storage -------------------------------------
+      File         Used  Use%  Avail  Size  Type
+      /home/user   996M  20%   4.1G   5.0G  nfs4
+-----------------------------------------------------------------------------------------------
+------------------------------------- user /data storage -------------------------------------
+     Filesystem    used   quota   limit   grace   files   quota   limit   grace
+          /data  85.89G      0k    105G       - 1477223       0       0       -
+-----------------------------------------------------------------------------------------------
+.fi
+.PP
+Fine jobs in the queue:
+.IP
+.nf
+[user\[at]lewis4-r630-login-node675 \[ti]]$ sbox -q
+----------------------------------- Jobs in the Queue ------------------------------------
+             JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
+          23150514     Lewis jupyter-    user   R       5:29      1 lewis4-r630-hpc4-node537
+.fi
+.SH AUTHOR
+Ashkan Mirzaee: https://ashki23.github.io/
+.SH INTERNET RESOURCES
+.br
+Documentation:  https://sbox.readthedocs.io/
+.br
+Downloads:  https://github.com/ashki23/sbox/releases/latest
+.br
+Module repository:  https://github.com/ashki23/sbox
+
+.SH LICENSING
+Sbox is distributed under an Open Source license. See the file
+"LICENSE" in the source distribution for information on terms &
+conditions for accessing and otherwise using Sbox and for a
+DISCLAIMER OF ALL WARRANTIES.

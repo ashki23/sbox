@@ -1,0 +1,136 @@
+.TH SBOX "1" "August 2021" "SBOX 1.2"
+.SH NAME
+interactive \- an alias for using cluster interactively
+.SH SYNOPSIS
+.B interactive
+[\fB-h\fR] [\fB-A\fR] [\fB-n\fR] [\fB-N\fR] [\fB-p\fR] [\fB-t\fR] [\fB-l\fR] [\fB-m\fR] [\fB-g\fR] [{jupyter}]
+.br
+.SH DESCRIPTION
+Interactive command uses Slurm srun and sbatch commands to request resources interactively including running a Jupyter server on the cluster. Multiple kernels and environments can be applied to use different software and packages in JupyterLab.
+.SH COMMAND LINE OPTIONS
+.TP
+.B -h, --help 
+Show this help message and exit
+.TP
+.B -A, --account 
+Slurm account name or project id
+.TP
+.B -n, --ntasks
+ Number of tasks (cpus)
+.TP
+.B -N, --nodes
+ Number of nodes
+.TP
+.B -p, --partition
+ Partition name
+.TP
+.B -t, --time
+ Number of hours (based on the partitions timelimit)
+.TP
+.B -l, --license
+ Add a license to an interactive session
+.TP
+.B -m, --mem
+ Amount of memory per GB
+.TP
+.B -g, --gpu
+ Number of gpus
+.TP
+.B -k, --kernel
+ Jupyter kernel for python, r, julia. The default kernel is python
+.TP
+.B -e, --environment
+ Python environment(s) for a JupyterLab session 
+.PP
+\f[B]Examples
+.PP
+Use the cluster interactively:
+.IP
+.nf
+[user\[at]lewis4-r630-login-node675 bin]$ module load sbox
+[user\[at]lewis4-r630-login-node675 \[ti]]$ interactive
+Logging into Interactive partition with 2G memory, 1 cpu for 2 hours ... 
+[user\[at]lewis4-r7425-htc5-node835 \[ti]]$ 
+.fi
+.PP
+Use the cluster interactively with more time and resources:
+.IP
+.nf
+[user\[at]lewis4-r630-login-node675 \[ti]]$ interactive --mem 16 -n 6 -t 4
+Logging into Interactive partition with 16G memory, 6 cpu for 4 hours ... 
+[user\[at]lewis4-r7425-htc5-node835 \[ti]]$
+.fi
+.PP
+Use the cluster interactively with a license:
+.IP
+.nf
+[user\[at]lewis4-r630-login-node675 \[ti]]$ interactive --mem 16 -n 6 -t 4 -l matlab
+Logging into Interactive partition with 16G memory, 6 cpu for 4 hours with a matlab license ... 
+[user\[at]lewis4-r7425-htc5-node835 \[ti]]$
+.fi
+.PP
+Use a Gpu interactively:
+.IP
+.nf
+[user\[at]lewis4-r630-login-node675 \[ti]]$ interactive -p Gpu
+Logging into Gpu partition with 1 gpu, 2G memory, 1 cpu for 2 hours ... 
+[user\[at]lewis4-r730-gpu3-node431 \[ti]]$
+.fi
+.PP
+Use JupyterLab:
+.IP
+.nf
+[user\[at]lewis4-r630-login-node675 \[ti]]$ interactive jupyter
+Logging into Lewis partition with 2G memory, 1 cpu for 2 hours ...
+Starting Jupyter server (it might take about a couple minutes) ...
+Starting Jupyter server ...
+Starting Jupyter server ...
+
+Jupyter Notebook is running.
+
+Open a new terminal in your local computer and run:
+ssh -NL 8888:lewis4-r630-hpc4-node303:8888 user\[at]lewis.rnet.missouri.edu
+
+After that open a browser and go:
+http://127.0.0.1:8888/?token=9e223bd179d228e0e334f8f4a85dfd904eebd0ab9ded7e55
+
+To stop the server run the following on the cluster:
+scancel 23150533
+.fi
+.PP
+Use TensorFlow with JupyterLab:
+.IP
+.nf
+[user\[at]lewis4-r630-login-node675 \[ti]]$ interactive jupyter -A general-gpu -p gpu3 --mem 16 -t 8 -e tensorflow
+Logging into gpu3 partition with 1 gpu, 16G memory, 1 cpu for 8 hours with account general-gpu ...
+Starting Jupyter server (it might take about a couple minutes) ...
+Starting Jupyter server ...
+Starting Jupyter server ...
+\&...
+.fi
+.PP
+Use R with JupyterLab:
+.IP
+.nf
+interactive jupyter -k r
+Logging into Lewis partition with 2G memory, 1 cpu for 2 hours ...
+Starting Jupyter server (it might take about a couple minutes) ...
+Starting Jupyter server ...
+Starting Jupyter server ...
+\&...
+.fi
+.SH AUTHOR
+Ashkan Mirzaee: https://ashki23.github.io/
+.SH INTERNET RESOURCES
+.br
+Documentation:  https://sbox.readthedocs.io/
+.br
+Downloads:  https://github.com/ashki23/sbox/releases/latest
+.br
+Module repository:  https://github.com/ashki23/sbox
+
+.SH LICENSING
+Sbox is distributed under an Open Source license. See the file
+"LICENSE" in the source distribution for information on terms &
+conditions for accessing and otherwise using Sbox and for a
+DISCLAIMER OF ALL WARRANTIES.

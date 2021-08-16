@@ -144,7 +144,7 @@ env:
    prepend_path("C_INCLUDE_PATH", this_root .. "/include", ":")
    prepend_path("CPLUS_INCLUDE_PATH", this_root .. "/include", ":")
    prepend_path("PKG_CONFIG_PATH", this_root .. "/lib/pkgconfig", ":")
-   setenv("ANACONDA_ROOT", this_root)
+   setenv("RESSENTIALS_ROOT", this_root)
 
 Or a tcl modulefile similar to the above tcl template for Anaconda.
 
@@ -192,7 +192,7 @@ The following modulefile should be added to
    prepend_path("C_INCLUDE_PATH", this_root .. "/include", ":")
    prepend_path("CPLUS_INCLUDE_PATH", this_root .. "/include", ":")
    prepend_path("PKG_CONFIG_PATH", this_root .. "/lib/pkgconfig", ":")
-   setenv("ANACONDA_ROOT", this_root)
+   setenv("JULIA_ROOT", this_root)
 
 Or a tcl modulefile similar to the above tcl template for Anaconda.
 
@@ -248,7 +248,7 @@ For each env, we need to add a modulefile to
    prepend_path("C_INCLUDE_PATH", this_root .. "/include", ":")
    prepend_path("CPLUS_INCLUDE_PATH", this_root .. "/include", ":")
    prepend_path("PKG_CONFIG_PATH", this_root .. "/lib/pkgconfig", ":")
-   setenv("ANACONDA_ROOT", this_root)
+   setenv("TENSORFLOW_ROOT", this_root)
 
 Or a tcl modulefile similar to the above tcl template for Anaconda.
 

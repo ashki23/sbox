@@ -2,21 +2,20 @@
 
 help(
 [[
-Sbox is a small toolbox for Slurm that provides information about users' accounts, jobs, and cluster resources.
-Sbox Interactive command uses srun to request resources interactively through a terminal or Jupyter Notebook.
+Sbox is a toolbox for Slurm that provides information about users' activities and facilitate access to the cluster resources from terminal or JupyterLab.
 ]]
 )
 
 whatis("Name: sbox")
-whatis("Version: 1.1")
+whatis("Version: 1.2")
 whatis("Category: Applications, Interactive")
 whatis("Keywords: Slurm, Jupyter")
-whatis("URL: https://github.com/ashki23/sbox")
+whatis("URL: https://sbox.readthedocs.io/")
 whatis("Description: Small toolbox for Slurm")
 
--- Create environment variables
-local sbox_dir   = "/cluster/software/sbox/1.1"
-local sbox_bin   = "/cluster/software/sbox/1.1/bin"
+-- Create environment variables (UPDATE THE PATH)
+local this_root   = "/cluster/software/path/sbox/1.2"
 
-prepend_path("PATH", sbox_bin)
-setenv("SBOX_ROOT", sbox_dir)
+prepend_path("PATH", this_root .. "/bin", ":")
+prepend_path("MANPATH", this_root .. "/share/man", ":")
+setenv("SBOX_ROOT", this_root)

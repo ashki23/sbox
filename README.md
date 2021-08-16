@@ -118,7 +118,7 @@ Fine jobs in the queue:
 
 ## Interactive
 
-`interactive` is an alias for using cluster interactively using Slurm `srun` command.
+`interactive` is an alias for using cluster interactively using Slurm `srun` command. The `interactive jupyter` command lets users work on the cluster from a Jupyter interface. The command submits a batch file by `sbatch` command and runs a Jupyter server on the cluster. Multiple kernels and environments can be applied to use different software and packages in JupyterLab.
 
 ### Command line options
 
@@ -127,10 +127,12 @@ Fine jobs in the queue:
 - `-n, --ntasks`: Number of tasks (cpus)
 - `-N, --nodes`: Number of nodes
 - `-p, --partition`: Partition name
-- `-t, --time`: Number of hours (up to 4)
-- `-l, --license`: License
+- `-t, --time`: Number of hours (based on the partitions timelimit)
+- `-l, --license`: Add a license to an interactive session
 - `-m, --mem`: Amount of memory per GB
 - `-g, --gpu`: Number of gpus
+- `-k, --kernel`: Jupyter kernel for python, r, julia. The default kernel is python.
+- `-e, --environment`: Python environment(s) for a JupyterLab session
 
 **Examples**
 
@@ -166,25 +168,6 @@ Use a Gpu interactively:
 Logging into Gpu partition with 1 gpu, 2G memory, 1 cpu for 2 hours ... 
 [user@lewis4-r730-gpu3-node431 ~]$
 ```
-
-## Interactive Jupyter
-
-The `interactive jupyter` command lets users work on the cluster from a Jupyter interface. The command submits a batch file by `sbatch` command and runs a Jupyter server on the cluster. Multiple kernels and environments can be applied to use different software and packages in JupyterLab.
-
-### Command line options
-
-- `-h, --help`: Show this help message and exit
-- `-A, --account`: Slurm account name or project id
-- `-n, --ntasks`: Number of tasks (cpus)
-- `-N, --nodes`: Number of nodes
-- `-p, --partition`: Partition name
-- `-t, --time`: Number of hours (up to 4)
-- `-k, --kernel`: Jupyter kernel for python, r, julia. Select one of the available kernels. The default kernel is python.
-- `-e, --environment`: Python environment(s) for tensorflow-v1.9, tensorflow, pytorch
-- `-m, --mem`: Amount of memory per GB
-- `-g, --gpu`: Number of gpus
-
-**Examples**
 
 Use JupyterLab:
 ```bash
