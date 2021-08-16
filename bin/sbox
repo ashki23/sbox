@@ -54,11 +54,9 @@ parser.add_argument('--gpu', action = 'store_true', help = 'show gpu resources')
 parser.add_argument('--license', action = 'store_true', help = 'show available licenses')
 parser.add_argument('--reserve', action = 'store_true', help = 'show reservation')
 parser.add_argument('--topusage', action = 'store_true', help = 'show top usage users')
-if os.popen('which ldapsearch 2> /dev/null').read():
-    parser.add_argument('--whodat', help = 'show users informations by uid', metavar = 'UID')
-    parser.add_argument('--whodat2', help = 'show users informations by name', metavar = 'UNAME')
-if os.popen('which ssh-agent 2> /dev/null').read():
-    parser.add_argument('--agent', choices = ['start','stop','list'], help = 'start/stop/list ssh-agents on the current host')
+parser.add_argument('--whodat', help = 'show users informations by uid', metavar = 'UID')
+parser.add_argument('--whodat2', help = 'show users informations by name', metavar = 'UNAME')
+parser.add_argument('--agent', choices = ['start','stop','list'], help = 'start/stop/list ssh-agents on the current host')
 args = parser.parse_args()
 
 if len(sys.argv) == 1:
@@ -181,6 +179,7 @@ if args.ncpu:
     if len(part_cpu) == 0:
         print('No CPU partition found in the config file!')
         sys.exit(1)
+
     print(' Number of CPUs '.center(90,'-'))
     for p in part_cpu:
         idle = os.popen(f"""
@@ -194,6 +193,7 @@ if args.ngpu:
     if len(part_gpu) == 0:
         print('No GPU partition found in the config file!')
         sys.exit(1)
+
     print(' Number of GPUs '.center(90,'-'))
     for g in part_gpu:
         unavail = os.popen(f"""
@@ -275,6 +275,7 @@ if args.quota:
     if len(disk_quota) == 0:
         print('No disk found in the config file!')
         sys.exit(1)    
+
     gpn = os.popen(f"""
     echo $(groups {args.user} | grep -Po "(?<=: ).*")
     """).read().strip().split()
