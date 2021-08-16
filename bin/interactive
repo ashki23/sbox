@@ -60,8 +60,8 @@ if 'jupyter' in sys.argv:
 else:
     parser.add_argument('-p', '--partition', choices = interactive_partition, default = interactive_partition[0], help = 'partition name', metavar = '')
     parser.add_argument('-t', '--time', type = int, choices = range(1, interactive_timelimt + 1), default = 2, help = f'number of hours (up to {interactive_timelimt})', metavar = '')
-    parser.add_argument('-l', '--license', help = 'license', metavar = '')
     parser.epilog = 'Command should be run from the login node.'
+parser.add_argument('-l', '--license', help = 'license', metavar = '')
 parser.add_argument('-m', '--mem', type = int, default = 2, help = 'amount of memory per GB', metavar = '')
 parser.add_argument('-g', '--gpu', type = int, default = 0, choices = range(3), help = 'number of gpus', metavar = '')
 parser.add_argument('interface', nargs = '?', choices = ['jupyter'], help = 'Starting Jupyter server on the cluster')
@@ -148,6 +148,10 @@ if args.interface == 'jupyter':
             announce += f" with account {args.account}"
             jb.write(f"""
 #SBATCH --account {args.account}""")
+        if args.license:
+            announce += f" and a {args.license} license"
+            jb.write(f"""
+#SBATCH --licenses {args.license}:1""")
         jb.write(f"""
 module load {module}
 if [ "{kernel}" == "julia" ]; then
