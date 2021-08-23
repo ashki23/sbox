@@ -125,7 +125,7 @@ if args.eff:
     os.system(f"""
     install -d ~/.seff
     rm ~/.seff/seff.out 2> /dev/null
-    if squeue -u {user} --format "%i %T" | grep {args.eff} | grep -Piq "RUNNING"; then
+    if squeue -j {args.eff} --format "%T" 2> /dev/null | grep -iq "RUNNING"; then
     cat > ~/.seff/seff-job.sh <<EOF
 #!/bin/bash
 #SBATCH --jobid {args.eff}
@@ -315,31 +315,7 @@ if args.quota:
                 """)
     
     else:
-        print(' Home Storage '.center(122,'-'))
-        if args.user in gpn:
-            lfsq = 'g'
-        else:
-            lfsq = 'u'
-        os.system(f"""
-        rm ~/.quota 2> /dev/null
-        lfs quota -h{lfsq} {args.user} {disk_quota[0]} > ~/.quota 2> /dev/null
-        if [ -s ~/.quota ]; then
-        if ! grep -q " 0. * 0. * 0. " ~/.quota; then
-        cat ~/.quota | grep -Pv "setting|gid|uid";
-        python3 -c "print(''.center(122,'-'))"; fi
-        else if [ -d {disk_quota[0]}/{args.user} ]; then
-        df -h --output="file,used,pcent,avail,size,fstype" {disk_quota[0]}/{args.user} | tr -s ' ' ',' | sed -e 's/^/,,,/' | column -t -s ',';
-        python3 -c "print(''.center(122,'-'))"; fi
-        fi
-        """)
-        
-        gpn = ' '.join(gpn)
-        os.system(f"""
-        if [ -z `which rcss-lfs-quota 2> /dev/null` ]; then echo "No rcss-lfs-quota found! You may try the command from the login node.\n"; exit; fi
-        python -c "print(' HPC Storage '.center(122,'-'))"
-        rcss-lfs-quota {gpn[:]}
-        echo
-        """)
+        print('Permission denied.')
 
 if args.agent:
     if args.agent == 'start':
