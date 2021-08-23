@@ -3,15 +3,21 @@ Sbox
 
 Sbox is a toolbox for Slurm that provides information about users' accounts and jobs as well as information about the cluster resources. Sbox also can help Slurm admins to collect users' information by user and job IDs. Interactive command uses Slurm ``srun`` and ``sbatch`` commands to request resources interactively including running a Jupyter server on the cluster.
 
-.. note:: You can download the latest release of Sbox from `https://github.com/ashki23/sbox/releases/latest <https://github.com/ashki23/sbox/releases/latest>`_ and find the codes or fork the repository on `https://github.com/ashki23/sbox <https://github.com/ashki23/sbox>`__.
+.. note:: You can download the latest release of Sbox from `https://github.com/ashki23/sbox/releases/latest <https://github.com/ashki23/sbox/releases/latest>`_ and find the source codes or fork the repository on `https://github.com/ashki23/sbox <https://github.com/ashki23/sbox>`__.
 
 Features
 --------
 
-* Access to large number of Slurm commands at one place
-* Easy ability to start a JupyerLab session or request resources interactively on a cluster
-* Showing users' activities and cluster resources with simple commands
-* Easy to set up and configure
+* Access to many Slurm features at one place.
+* Facilitate request resources interactively.
+* Easy ability to start a JupyerLab session.
+* JupyterLab interface with multiple kernels.
+* JupyterLab interface with access to virtual environments for Python libraries such as TensorFlow and PyTorch .
+* Easy to set up and configure. It cab be installed in the user level or cluster-wide
+* Explanatory help options (``--help``) and reference manuals (``man sbox, man interactive``).
+* Improving ``seff`` command by using ``top`` command for showing the running jobs efficiency.
+* Managing users ssh-agent to be able to communicate with clients outside (e.g. GitHub) or within the cluster (other nodes) without asking for the passphrase.
+* Helping users by showing their fairshares, accounts, quotas, jobs' efficiencies and history, running and pending jobs, as well as  the cluster resources.
 
 Install
 -------
@@ -28,4 +34,3 @@ Commands
     :maxdepth: 1
 
     sbox
-

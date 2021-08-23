@@ -1,6 +1,6 @@
 .TH SBOX "1" "August 2021" "SBOX 1.2"
 .SH NAME
-sbox \- a small toolbox for Slurm
+sbox \- a simple toolbox for Slurm
 .SH SYNOPSIS
 .B sbox
 [\fB-h\fR] [\fB-a\fR] [\fB-f\fR] [\fB-g\fR] [\fB-q\fR] [\fB-j\fR JOBID] [\fB-c\fR] [\fB-p\fR] [\fB-u\fR UID] [\fB-v\fR]
@@ -87,15 +87,20 @@ Show Slurm reservations using Slurm scontrol command.
 .B --topusage 
 Show top usage users using Slurm sreport command.
 .TP
+.B --whodat
+Show users informations by uid. It uses ldapsearch command and returns empty output if the cluster does not use LDAP.
+.TP
+.B --whodat2
+Show users informations by name. It uses ldapsearch command and returns empty output if the cluster does not use LDAP.
+.TP
 .B --agent 
 Start, stop and list users ssh-agents on the current host. It requires one of the start/stop/list options as an argument. Use ssh -o StrictHostKeyChecking=no to disable asking for host key acceptances.
 .PP
 \f[B]Examples
 .PP
-See jobs histoty
+Jobs histoty
 .IP
 .nf
-[user\[at]lewis4-r630-login-node675 \[ti]]$ module load sbox
 [user\[at]lewis4-r630-login-node675 \[ti]]$ sbox --hist day
 -------------------------------------------------------------------------------- Jobs History - Last Day ---------------------------------------------------------------------
      JobID   User Account      State Partition     QOS NCPU NNod ReqMem              Submit   Reserved               Start    Elapsed                 End             NodeList
@@ -109,10 +114,10 @@ See jobs histoty
   23126131  user  genera+ CANCELLED+       Gpu  normal    1    1    2Gn 2021-07-28T01:27:43   00:00:01 2021-07-28T01:27:44   00:01:03 2021-07-28T01:28:47 lewis4-z10pg-gpu3-n+
 .fi
 .PP
-Find a jobs efficiency:
+Jobs efficiency:
 .IP
 .nf
-[user\[at]lewis4-r630-login-node675 \[ti]]$ sbox --eff 23148125
+[user\[at]lewis4-r630-login-node675 \[ti]]$ sbox --eff 23126131
 ------------------------------------- Job Efficiency -------------------------------------
 Job ID: 23126131
 Cluster: lewis4
@@ -125,7 +130,7 @@ Memory Utilized: 45.80 MB
 Memory Efficiency: 2.24% of 2.00 GB
 .fi
 .PP
-Find accounts, fairshares, and groups:
+Accounts, fairshares, and groups:
 .IP
 .nf
 [user\[at]lewis4-r630-login-node675 \[ti]]$ sbox -afg
@@ -145,7 +150,7 @@ rcss-gpu                   user          1    0.000181           0      0.000000
 user : user rcss gaussian biocompute rcsslab-group rcss-maintenance rcss-cie software-cache
 .fi
 .PP
-Find disk quotas:
+Disk quotas:
 .IP
 .nf
 [user\[at]lewis4-r630-login-node675 \[ti]]$ sbox --quo
@@ -159,7 +164,7 @@ Find disk quotas:
 -----------------------------------------------------------------------------------------------
 .fi
 .PP
-Fine jobs in the queue:
+Jobs in the queue:
 .IP
 .nf
 [user\[at]lewis4-r630-login-node675 \[ti]]$ sbox -q

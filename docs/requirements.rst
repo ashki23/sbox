@@ -2,11 +2,11 @@ Quick install
 =============
 
 -  Download and extract the `latest Sbox release <https://github.com/ashki23/sbox/releases/latest>`__.
--  Update the ``./config`` file based on the cluster information. Review
+-  Update the ``config`` file based on the cluster information. Review
    `Configuration <https://sbox.readthedocs.io/en/latest/requirements.html#configuration>`__ to learn more.
 -  To access a JupyerLab session, install Anaconda and create the required virtual environments and modulefiles. Review
    `Requirements <https://sbox.readthedocs.io/en/latest/requirements.html#requirements>`__ to learn more.
--  Place a modulefile for Sbox under ``$MODULEPATH/sbox``. You can find the Sbox template modulefile in `here <https://github.com/ashki23/sbox/blob/main/templates/1.2.lua>`__.
+-  Place a modulefile for Sbox under ``$MODULEPATH/sbox`` and load the module or add the Sbox bin directory to ``$PATH``. A Sbox template modulefile can be found in `here <https://github.com/ashki23/sbox/blob/main/templates/1.2.lua>`__.
 
 Requirements
 ============
@@ -16,7 +16,7 @@ command requires Anaconda and an environment module system
 (e.g. `Lmod <https://lmod.readthedocs.io/en/latest/>`__) in addition to
 Slurm and Python. To use R and Julia in JupyterLab sessions, we need R and irkernel as well as Julia to be installed.
 
-Note that Sbox options might require some other Unix commands. Review
+Note that Sbox options require some other commands. Review
 the options requirement under the `command line options <https://sbox.readthedocs.io/en/latest/sbox.html#command-line-options>`__.
 
 The following shows how to install Anaconda and create the required
@@ -252,7 +252,7 @@ For each env, we need to add a modulefile to
 
 Or adding a tcl modulefile similar to the above tcl template for Anaconda.
 
-configuration
+Configuration
 =============
 
 The ``sbox`` and ``interactive`` commands are reading the required

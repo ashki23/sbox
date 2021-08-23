@@ -35,7 +35,7 @@ html_theme_options = {
     'fixed_sidebar': True,
     'github_button': True,
     'page_width': '65%',
-    'description': "Sbox is a toolbox for Slurm that provides information about users' activities and facilitate access to the cluster resources from terminal or JupyterLab.",
+    'description': "Sbox is a toolbox for Slurm that provides information about users activities and facilitate access to the cluster resources.",
 }
 
 # The full version, including alpha/beta/rc tags

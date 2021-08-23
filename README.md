@@ -2,6 +2,19 @@
 
 Sbox is a toolbox for Slurm that provides information about users' accounts and jobs as well as information about the cluster resources. Sbox also can help Slurm admins to collect users' information by user and job IDs. Interactive command uses Slurm `srun` and `sbatch` commands  to request resources interactively including running a Jupyter server on the cluster.
 
+## Features
+
+- Access to many Slurm features at one place.
+- Facilitate request resources interactively.
+- Easy ability to start a JupyerLab session.
+- JupyterLab interface with multiple kernels.
+- JupyterLab interface with access to virtual environments for Python libraries such as TensorFlow and PyTorch .
+- Easy to set up and configure. It cab be installed in the user level or cluster-wide
+- Explanatory help options (`--help`) and reference manuals (`man sbox, man interactive`).
+- Improving `seff` command by using `top` command for showing the running jobs efficiency.
+- Managing users ssh-agent to be able to communicate with clients outside (e.g. GitHub) or within the cluster (other nodes) without asking for the passphrase.
+- Helping users by showing their fairshares, accounts, quotas, jobs' efficiencies and history, running and pending jobs, as well as  the cluster resources.
+
 ## Commands
 
 - `sbox`
@@ -24,10 +37,10 @@ Sbox is a toolbox for Slurm that provides information about users' accounts and 
 - `-u, --user`: Store a user ID. By default it uses `$USER` as user ID for any query that needs a user ID. It can be used with other options to find the information for other users.
 - `-v, --version`: Show program's version number and exit.
 - `--eff`: Show efficiency of a job. It requires a valid job ID as argument. It uses Slurm `seff` command for completed/finished jobs and Unix `top` command for a running job.
-- `--history`: Return jobs history for last day, week, month or year. It requires one of the day/week/month/year options as an argument. It uses Slurm `sacct` command and return empty output if the cluster does not use Slurm for users' account management.
+- `--history`: Return jobs history for last day, week, month or year. It requires one of the day/week/month/year options as an argument. It uses Slurm `sacct` command and returns empty output if the cluster does not use Slurm for users' account management.
 - `--pending`: Return user's pending jobs by using Slurm `squeue` command.
 - `--running`: Return user's running jobs by using Slurm `squeue` command.
-- `--qos`: Show user's quality of services (QOS) and a list of available QOS in the cluster. It uses Slurm `sacctmgr show assoc` command and return empty output if the cluster does not use Slurm for users' account management.
+- `--qos`: Show user's quality of services (QOS) and a list of available QOS in the cluster. It uses Slurm `sacctmgr show assoc` command and returns empty output if the cluster does not use Slurm for users' account management.
 - `--quota`: Return user's disk quotas. It uses `lfs quota` command for LFS systems and Unix `df` command for NFS systems. It returns pooled size of the disk if the cluster does not have user/group storage accounts.
 - `--ncpu`: Show number of available cpus on the cluster using Slurm `sinfo` command.
 - `--ncgu`: Show number of available gpus on the cluster using Slurm `squeue` and `sinfo` commands.
@@ -35,14 +48,15 @@ Sbox is a toolbox for Slurm that provides information about users' accounts and 
 - `--license`: Show available license servers using Slurm `scontrol` command.
 - `--reserve`: Show Slurm reservations using Slurm `scontrol` command.
 - `--topusage`: Show top usage users using Slurm `sreport` command.
+- `--whodat`: Show users informations by uid. It uses `ldapsearch` command and returns empty output if the cluster does not use LDAP.
+- `--whodat2`: Show users informations by name. It uses `ldapsearch`command and returns empty output if the cluster does not use LDAP.
 - `--agent`: Start, stop and list user's ssh-agents on the current host. It requires one of the start/stop/list options as an argument. Use `ssh -o StrictHostKeyChecking=no` to disable asking for host key acceptances.
 
 **Examples**
 
-See jobs' histoty:
+Jobs histoty:
 
 ```bash
-[user@lewis4-r630-login-node675 ~]$ module load sbox
 [user@lewis4-r630-login-node675 ~]$ sbox --hist day
 -------------------------------------------------------------------------------- Jobs History - Last Day --------------------------------------------------------------------------------
      JobID   User Account      State Partition     QOS NCPU NNod ReqMem              Submit   Reserved               Start    Elapsed                 End             NodeList    JobName 
@@ -56,23 +70,33 @@ See jobs' histoty:
   23126131  user  genera+ CANCELLED+       Gpu  normal    1    1    2Gn 2021-07-28T01:27:43   00:00:01 2021-07-28T01:27:44   00:01:03 2021-07-28T01:28:47 lewis4-z10pg-gpu3-n+ jupyter-py 
 ```
 
-Find a job's efficiency:
+Jobs efficiency for running and compeleted jobs:
 
 ```bash
-[user@lewis4-r630-login-node675 ~]$ sbox --eff 23148125
+[user@lewis4-r630-login-node675 ~]$ sbox --eff 23227816
+------------------------------------- Job Efficiency -------------------------------------
+   PID USER      PR  NI    VIRT    RES     SHR  S   %CPU   %MEM   TIME+ COMMAND
+ 47262 user      20   0  115700   3888     1600 S   0.0    0.0    0:00.03 bash
+ 47346 user      20   0  113292   149298   1256 S   99.0   23.0   0:13.30 python
+
+RES: shows resident memory which is accurate representation of how much actual physical memory a process is consuming
+%CPU: shows the percentage of the CPU that is being used by the process
+```
+```bash
+[user@lewis4-r630-login-node675 ~]$ sbox --eff 23126131
 ------------------------------------- Job Efficiency -------------------------------------
 Job ID: 23126131
 Cluster: lewis4
 User/Group: user/user
-State: CANCELLED (exit code 0)
+State: COMPLETED (exit code 0)
 Cores: 1
-CPU Utilized: 00:00:01
-CPU Efficiency: 1.59% of 00:01:03 core-walltime
-Memory Utilized: 45.80 MB
-Memory Efficiency: 2.24% of 2.00 GB
+CPU Utilized: 00:11:01
+CPU Efficiency: 48.59% of 00:21:03 core-walltime
+Memory Utilized: 445.80 MB
+Memory Efficiency: 24.24% of 2.00 GB
 ```
 
-Find accounts, fairshares, and groups:
+Accounts, fairshares, and groups:
 
 ```bash
 [user@lewis4-r630-login-node675 ~]$ sbox -afg
@@ -92,7 +116,7 @@ rcss-gpu                   user          1    0.000181           0      0.000000
 user : user rcss gaussian biocompute rcsslab-group rcss-maintenance rcss-cie software-cache
 ```
 
-Find disk quotas:
+Disk quotas:
 
 ```bash
 [user@lewis4-r630-login-node675 ~]$ sbox --quo
@@ -106,7 +130,7 @@ Find disk quotas:
 -----------------------------------------------------------------------------------------------
 ```
 
-Fine jobs in the queue:
+Jobs in the queue:
 
 ```bash
 [user@lewis4-r630-login-node675 ~]$ sbox -q
@@ -116,9 +140,33 @@ Fine jobs in the queue:
 
 ```
 
+Cluster resources:
+```bash
+[user@lewis4-r630-login-node675 ~]$ sbox --ngpu
+------------------------------------- Number of GPUs -------------------------------------
+Partition Gpu has 19 gpus available out of 27 (70%)
+Partition gpu3 has 15 gpus available out of 15 (100%)
+Partition gpu4 has 4 gpus available out of 12 (33%)
+```
+```bash
+[user@lewis4-r630-login-node675 ~]$ sbox --ncpu
+------------------------------------- Number of CPUs -------------------------------------
+Partition Interactive has 158 cpus available out of 160 (99%)
+Partition Lewis has 161 cpus available out of 2344 (7%)
+Partition Serial has 42 cpus available out of 48 (88%)
+Partition Dtn has 35 cpus available out of 36 (97%)
+Partition hpc3 has 24 cpus available out of 456 (5%)
+Partition hpc4 has 79 cpus available out of 1008 (8%)
+Partition hpc4rc has 58 cpus available out of 952 (6%)
+Partition hpc5 has 70 cpus available out of 1400 (5%)
+Partition hpc6 has 0 cpus available out of 2976 (0%)
+Partition General has 1837 cpus available out of 7008 (26%)
+Partition Gpu has 383 cpus available out of 412 (93%)
+```
+
 ## Interactive
 
-`interactive` is an alias for using cluster interactively using Slurm `srun` command. The `interactive jupyter` command lets users work on the cluster from a Jupyter interface. The command submits a batch file by `sbatch` command and runs a Jupyter server on the cluster. Multiple kernels and environments can be applied to use different software and packages in JupyterLab.
+`interactive` is an alias for using cluster interactively using Slurm `srun` and `sbatch` commands. The `interactive jupyter` provides a JupyterLab interface for using scientific software including Python, R, Julia, and their libraries. The command submits a batch file by `sbatch` command and runs a Jupyter server on the cluster. Multiple kernels and environments can be applied to use different software and packages in JupyterLab.
 
 ### Command line options
 
@@ -212,15 +260,15 @@ Starting Jupyter server ...
 ## Quick install
 
 - Download and extract the [latest Sbox release](https://github.com/ashki23/sbox/releases/latest).
-- Update the `./config` file based on the cluster information. Review "Configuration" to learn more.
+- Update the `config` file based on the cluster information. Review "Configuration" to learn more.
 - To access a JupyerLab session, install Anaconda and create the required virtual environments and modulefiles. Review "Requirements" to learn more.
-- Place a modulefile for Sbox under `$MODULEPATH/sbox` directory. You can find the Sbox template modulefile in `./templates/1.2.lua`.
+- Place a modulefile for Sbox under `$MODULEPATH/sbox` directory and load the module or add the Sbox bin directory to `$PATH`. A Sbox template modulefile can be found under `./templates/1.2.lua`.
 
 ## Requirements
 
 Sbox requires Slurm and Python >= 3.6.8. The `interactive jupyter` command requires Anaconda and an environment module system (e.g. [Lmod](https://lmod.readthedocs.io/en/latest/)) in addition to Slurm and Python. To use R and Julia in JupyterLab sessions, we need R and irkernel as well as Julia to be installed.
 
-Note that Sbox options might require some other Unix commands. Review the options requirement under the command line options.
+Note that Sbox options require some other commands. Review the options requirement under the command line options.
 
 The following shows how to install Anaconda and create the required virtual envs and modulefiles.
 

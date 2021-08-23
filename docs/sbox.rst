@@ -40,7 +40,7 @@ Command line options
    and Unix ``top`` command for a running job.
 -  ``--history``: Return jobs history for last day, week, month or year.
    It requires one of the day/week/month/year options as an argument. It
-   uses Slurm ``sacct`` command and return empty output if the cluster
+   uses Slurm ``sacct`` command and returns empty output if the cluster
    does not use Slurm for users’ account management.
 -  ``--pending``: Return user’s pending jobs by using Slurm ``squeue``
    command.
@@ -48,7 +48,7 @@ Command line options
    command.
 -  ``--qos``: Show user’s quality of services (QOS) and a list of
    available QOS in the cluster. It uses Slurm ``sacctmgr show assoc``
-   command and return empty output if the cluster does not use Slurm for
+   command and returns empty output if the cluster does not use Slurm for
    users’ account management.
 -  ``--quota``: Return user’s disk quotas. It uses ``lfs quota``
    command for LFS systems and Unix ``df`` command for NFS systems. It
@@ -65,6 +65,10 @@ Command line options
 -  ``--reserve``: Show Slurm reservations using Slurm ``scontrol``
    command.
 -  ``--topusage``: Show top usage users using Slurm ``sreport`` command.
+- ``--whodat``: Show users informations by uid. It uses ``ldapsearch``
+  command and returns empty output if the cluster does not use LDAP.
+- ``--whodat2``: Show users informations by name. It uses ``ldapsearch``
+  command and returns empty output if the cluster does not use LDAP.
 -  ``--agent``: Start, stop and list user’s ssh-agents on the current
    host. It requires one of the start/stop/list options as an argument.
    Use ``ssh -o StrictHostKeyChecking=no`` to disable asking for host
@@ -72,11 +76,10 @@ Command line options
 
 **Examples**
 
-See jobs’ histoty:
+Jobs histoty:
 
 .. code:: bash
 
-   [user@lewis4-r630-login-node675 ~]$ module load sbox
    [user@lewis4-r630-login-node675 ~]$ sbox --hist day
    -------------------------------------------------------------------------------- Jobs History - Last Day --------------------------------------------------------------------------------
         JobID   User Account      State Partition     QOS NCPU NNod ReqMem              Submit   Reserved               Start    Elapsed                 End             NodeList    JobName 
@@ -89,23 +92,34 @@ See jobs’ histoty:
      23126130  user  genera+  COMPLETED       Gpu  normal    1    1    2Gn 2021-07-28T01:26:38   00:00:02 2021-07-28T01:26:40   00:00:11 2021-07-28T01:26:51 lewis4-z10pg-gpu3-n+       bash 
      23126131  user  genera+ CANCELLED+       Gpu  normal    1    1    2Gn 2021-07-28T01:27:43   00:00:01 2021-07-28T01:27:44   00:01:03 2021-07-28T01:28:47 lewis4-z10pg-gpu3-n+ jupyter-py 
 
-Find a job’s efficiency:
+Jobs efficiency for running and compeleted jobs:
 
 .. code:: bash
 
-   [user@lewis4-r630-login-node675 ~]$ sbox --eff 23148125
+   [user@lewis4-r630-login-node675 ~]$ sbox --eff 23227816
+   ------------------------------------- Job Efficiency -------------------------------------
+   PID   USER      PR  NI    VIRT   RES      SHR  S   %CPU   %MEM   TIME+   COMMAND
+   47262 user      20   0  115700   3888     1600 S   0.0    0.0    0:00.03 bash
+   47346 user      20   0  113292   149298   1256 S   99.0   23.0   0:13.30 python
+   
+   RES: shows resident memory which is accurate representation of how much actual physical memory a process is consuming
+   %CPU: shows the percentage of the CPU that is being used by the process
+
+.. code:: bash
+
+   [user@lewis4-r630-login-node675 ~]$ sbox --eff 23126131
    ------------------------------------- Job Efficiency -------------------------------------
    Job ID: 23126131
    Cluster: lewis4
    User/Group: user/user
    State: CANCELLED (exit code 0)
    Cores: 1
-   CPU Utilized: 00:00:01
-   CPU Efficiency: 1.59% of 00:01:03 core-walltime
-   Memory Utilized: 45.80 MB
-   Memory Efficiency: 2.24% of 2.00 GB
+   CPU Utilized: 00:11:01
+   CPU Efficiency: 48.59% of 00:21:03 core-walltime
+   Memory Utilized: 445.80 MB
+   Memory Efficiency: 24.24% of 2.00 GB
 
-Find accounts, fairshares, and groups:
+Accounts, fairshares, and groups:
 
 .. code:: bash
 
@@ -125,7 +139,7 @@ Find accounts, fairshares, and groups:
    ----------------------------------------- Groups -----------------------------------------
    user : user rcss gaussian biocompute rcsslab-group rcss-maintenance rcss-cie software-cache
 
-Find disk quotas:
+Disk quotas:
 
 .. code:: bash
 
@@ -139,7 +153,7 @@ Find disk quotas:
              /data  85.89G      0k    105G       - 1477223       0       0       -
    -----------------------------------------------------------------------------------------------
 
-Fine jobs in the queue:
+Jobs in the queue:
 
 .. code:: bash
 
@@ -148,15 +162,41 @@ Fine jobs in the queue:
                 JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
              23150514     Lewis jupyter-    user   R       5:29      1 lewis4-r630-hpc4-node537
 
+Cluster resources:
+
+.. code:: bash
+
+   [user@lewis4-r630-login-node675 ~]$ sbox --ngpu
+   ------------------------------------- Number of GPUs -------------------------------------
+   Partition Gpu has 19 gpus available out of 27 (70%)
+   Partition gpu3 has 15 gpus available out of 15 (100%)
+   Partition gpu4 has 4 gpus available out of 12 (33%)
+
+.. code:: bash
+
+   [user@lewis4-r630-login-node675 ~]$ sbox --ncpu
+   ------------------------------------- Number of CPUs -------------------------------------
+   Partition Interactive has 158 cpus available out of 160 (99%)
+   Partition Lewis has 161 cpus available out of 2344 (7%)
+   Partition Serial has 42 cpus available out of 48 (88%)
+   Partition Dtn has 35 cpus available out of 36 (97%)
+   Partition hpc3 has 24 cpus available out of 456 (5%)
+   Partition hpc4 has 79 cpus available out of 1008 (8%)
+   Partition hpc4rc has 58 cpus available out of 952 (6%)
+   Partition hpc5 has 70 cpus available out of 1400 (5%)
+   Partition hpc6 has 0 cpus available out of 2976 (0%)
+   Partition General has 1837 cpus available out of 7008 (26%)
+   Partition Gpu has 383 cpus available out of 412 (93%)
+
 Interactive
 ============
 
 ``interactive`` is an alias for using cluster interactively using Slurm
-``srun`` command. The ``interactive jupyter`` command lets users work on the cluster from
-a Jupyter interface. The command submits a batch file by ``sbatch``
-command and runs a Jupyter server on the cluster. Multiple kernels and
-environments can be applied to use different software and packages in
-JupyterLab.
+``srun`` and ``sbatch`` commands. The ``interactive jupyter`` provides a
+JupyterLab interface for using scientific software including Python, R,
+Julia, and their libraries. The command submits a batch file and runs a
+Jupyter server on the cluster. Multiple kernels and environments can be
+applied to use different software and packages in JupyterLab.
 
 Command line options
 --------------------
