@@ -46,6 +46,7 @@ parser.add_argument('--eff', type = int, help = 'show efficiency of a job', meta
 parser.add_argument('--history', choices = ['day','week','month','year'], help = 'show jobs history for last day/week/month/year')
 parser.add_argument('--pending', action = 'store_true', help = 'show pending jobs')
 parser.add_argument('--running', action = 'store_true', help = 'show running jobs')
+parser.add_argument('--cancel', help = 'cancel jobs by a single ID or a comma separated list of IDs', metavar = 'JOBID')
 parser.add_argument('--qos', action = 'store_true', help = 'show quality of services')
 parser.add_argument('--quota', action = 'store_true', help = 'show quotas')
 parser.add_argument('--ncpu', action = 'store_true', help = 'show number of available cpus')
@@ -163,6 +164,11 @@ if args.pending:
     print(' Pending Jobs '.center(175,'-'))
     os.system(f"""
     squeue --user {args.user} --states PENDING --sort S --format "%10i %6u %7a %10T %9P %7q %5C %5D %7m %20V %20S %25Y %20r %j"
+    """)
+
+if args.cancel:
+    os.system(f"""
+    scancel {args.cancel}
     """)
 
 if args.qos:
