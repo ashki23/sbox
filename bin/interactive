@@ -56,7 +56,8 @@ if 'jupyter' in sys.argv:
     if len(kernel_all) > 1:
         parser.add_argument('-k', '--kernel', choices = kernel_all, default = 'python', help = f"Jupyter kernel for {', '.join(kernel_all)}", metavar = '')
     if len(env) > 0:
-        parser.add_argument('-e', '--environment', choices = env, help = f"Python environment(s) for {', '.join(env)}", metavar = '')
+        parser.add_argument('-e', '--environment', choices = env, help = f"virtual environment(s) for {', '.join(env)}", metavar = '')
+    parser.add_argument('-y', '--myenv', help = 'path to a local virtual environment', metavar = '')
 else:
     parser.add_argument('-p', '--partition', choices = interactive_partition, default = interactive_partition[0], help = 'partition name', metavar = '')
     parser.add_argument('-t', '--time', type = int, choices = range(1, interactive_timelimt + 1), default = 2, help = f'number of hours (up to {interactive_timelimt})', metavar = '')
@@ -115,22 +116,32 @@ if args.interface == 'jupyter':
         print(f"Partition time limit. Max time for {args.partition} partition is {partition_timelimit} hours.")
         sys.exit(1)
     
-    if args.kernel != 'python' and args.environment:
-        print('Select "python" kernel for using Python envs!')
+    if args.myenv:
+        if not os.path.isdir(args.myenv):
+            print('Invalid path for the local env.')
+            sys.exit(1)
+    
+    if args.myenv and args.environment:
+        print('Invalid options! Use one of --myenv or --environment options.')
         sys.exit(1)
     
     kernel = args.kernel
     module = config['kernel_module'][kernel]
-
+    
     if kernel == 'julia': module = config['kernel_module']['python']
     
     if args.environment:
         module = config['env_module'][args.environment]
+        kernel = "env"
     
-    ml_test = os.popen(f"if [ -z `module load {module} > /dev/null 2>&1 && which jupyter-lab 2> /dev/null` ]; then echo 'no-jupyter-found'; fi").read().strip()
-    if ml_test == 'no-jupyter-found':
-        print(f"jupyter-lab command not found!")
-        sys.exit(1)
+    if args.myenv:
+        kernel = "myenv"
+    
+    if module:
+        ml_test = os.popen(f"if [ -z `module load {module} > /dev/null 2>&1 && which jupyter-lab 2> /dev/null` ]; then echo 'no-jupyter-found'; fi").read().strip()
+        if ml_test == 'no-jupyter-found':
+            print(f"jupyter-lab command not found!")
+            sys.exit(1)
     
     os.system(f"install -d ~/.jupyter/job")
     with open(f"{home}/.jupyter/job/{kernel}-jupyter-job",'w') as jb:
@@ -152,13 +163,23 @@ if args.interface == 'jupyter':
             announce += f" and a {args.license} license"
             jb.write(f"""
 #SBATCH --licenses {args.license}:1""")
-        jb.write(f"""
+        if args.myenv:
+            jb.write(f"""
+export PATH={args.myenv}/bin:${{PATH}}
+export LIBRARY_PATH={args.myenv}/lib:${{LIBRARY_PATH}}
+export LD_LIBRARY_PATH={args.myenv}/lib:${{LD_LIBRARY_PATH}}
+export INCLUDE={args.myenv}/include:${{INCLUDE}}
+echo `hostname`
+jupyter-lab --no-browser --ip 0.0.0.0\n""")
+        else:
+            jb.write(f"""
 module load {module}
 if [ "{kernel}" == "julia" ]; then
 module load {config['kernel_module']['julia']}
 julia -e 'using Pkg; Pkg.add("IJulia")'; fi
+echo `hostname`
 jupyter-lab --no-browser --ip 0.0.0.0\n""")
-    
+
     os.system(f"""
 cd ~
 rm ~/.jupyter/job/{kernel}-*.out 2> /dev/null
@@ -169,8 +190,9 @@ sleep 3
 echo "Starting Jupyter server (it might take about a couple minutes) ..."
 if [ "{kernel}" == "julia" ]; then echo "Installing Ijulia ... "; fi
 myn=0
-while ! grep -iq 'use control-c' ~/.jupyter/job/{kernel}-$jid.out > /dev/null 2>&1; do
+while ! grep -iq 'token' ~/.jupyter/job/{kernel}-$jid.out > /dev/null 2>&1; do
 sleep 10
+if sacct -Xj $jid -o State | grep -q FAILED; then echo "Job is failed. See more details in \n~/.jupyter/job/{kernel}-$jid.out"; exit; fi
 if squeue -j $jid | grep -q AccountNotAllowed; then echo "{args.account} account not allowed to use {args.partition} partition. Use another account or change the partition."; exit; fi
 echo "Starting Jupyter server ..."
 myn=`expr $myn + 1`
@@ -191,11 +213,11 @@ cd - > /dev/null 2>&1
     """)
 
     jid = os.popen("ls -t ~/.jupyter/job/%s-*.out 2> /dev/null | head -n 1 | grep -Po '(?<=job/%s-).*(?=.out)'" % (kernel,kernel)).read().strip()
-    port = os.popen("cat ~/.jupyter/job/%s-%s.out 2> /dev/null | grep '\[.*\].http://' | grep -Po '(?<=http://).*' | grep -Po '(?<=:)\d{4}(?=/?)'" % (kernel,jid)).read().strip()
-    host = os.popen(f"cat ~/.jupyter/job/{kernel}-{jid}.out 2> /dev/null | grep '\[.*\].http://' | grep -Po '(?<=http://).*' | grep -Po '.*(?=:)'").read().strip()
-    url = os.popen(f"cat ~/.jupyter/job/{kernel}-{jid}.out 2> /dev/null | grep '\[.*\].*or.*http://' | grep -Po '(?<=or ).*'").read().strip()
+    host = os.popen(f"head -n 1 ~/.jupyter/job/{kernel}-{jid}.out 2> /dev/null").read().strip()
+    port = os.popen(f"cat ~/.jupyter/job/{kernel}-{jid}.out 2> /dev/null | grep -Po '(?<=http://{host}:)[0-9]*(?=/)' | head -n 1").read().strip()
+    url = os.popen(f"cat ~/.jupyter/job/{kernel}-{jid}.out 2> /dev/null | grep -Po 'http://[0-9\.]*:{port}.*' | head -n 1").read().strip()
     
-    if len(jid) > 0:
+    if jid and url:
         print(f"""
 Jupyter Notebook is running.
 
