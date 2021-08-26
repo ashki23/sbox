@@ -30,6 +30,7 @@
     "env_module": {
 	"tensorflow-v1.9": "tensorflow/1.9.0",
 	"tensorflow": "tensorflow",
-	"pytorch": "pytorch"
+	"pytorch": "pytorch",
+	"r-bio": "r-bioessentials"
     }
 }

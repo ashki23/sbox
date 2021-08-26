@@ -46,6 +46,8 @@ Command line options
    command.
 -  ``--running``: Return user’s running jobs by using Slurm ``squeue``
    command.
+- ``--cancel``: Cancel jobs by a single ID or a comma separated list of 
+  IDs using Slurm ``scancel`` command.
 -  ``--qos``: Show user’s quality of services (QOS) and a list of
    available QOS in the cluster. It uses Slurm ``sacctmgr show assoc``
    command and returns empty output if the cluster does not use Slurm for
@@ -65,7 +67,7 @@ Command line options
 -  ``--reserve``: Show Slurm reservations using Slurm ``scontrol``
    command.
 -  ``--topusage``: Show top usage users using Slurm ``sreport`` command.
-- ``--whodat``: Show users informations by uid. It uses ``ldapsearch``
+- ``--whodat``: Show users informations by UID. It uses ``ldapsearch``
   command and returns empty output if the cluster does not use LDAP.
 - ``--whodat2``: Show users informations by name. It uses ``ldapsearch``
   command and returns empty output if the cluster does not use LDAP.
@@ -202,7 +204,7 @@ Command line options
 --------------------
 
 -  ``-h, --help``: Show this help message and exit.
--  ``-A, --account``: Slurm account name or project id.
+-  ``-A, --account``: Slurm account name or project ID.
 -  ``-n, --ntasks``: Number of tasks (cpus).
 -  ``-N, --nodes``: Number of nodes.
 -  ``-p, --partition``: Partition name.
@@ -211,7 +213,8 @@ Command line options
 -  ``-m, --mem``: Amount of memory per GB.
 -  ``-g, --gpu``: Number of gpus.
 -  ``-k, --kernel``: Jupyter kernel for python, r, julia. The default kernel is python.
--  ``-e, --environment``: Python environment(s) for a JupyterLab session.
+-  ``-e, --environment``: Virtual environment(s) for a JupyterLab session.
+-  ``-y , --myenv``: Path to a local virtual environment. The local virtual envs should contain JupyterLab.
 
 **Examples**
 

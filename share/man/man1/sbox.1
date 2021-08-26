@@ -63,6 +63,9 @@ Return users pending jobs by using Slurm squeue command.
 .B --running 
 Return users running jobs by using Slurm squeue command.
 .TP
+.B --cancel
+Cancel jobs by a single ID or a comma separated list of IDs using Slurm scancel command.
+.TP
 .B --qos 
 Show users quality of services (QOS) and a list of available QOS in the cluster. It uses Slurm sacctmgr show assoc command and return empty output if the cluster does not use Slurm for users account management.
 .TP
@@ -88,7 +91,7 @@ Show Slurm reservations using Slurm scontrol command.
 Show top usage users using Slurm sreport command.
 .TP
 .B --whodat
-Show users informations by uid. It uses ldapsearch command and returns empty output if the cluster does not use LDAP.
+Show users informations by UID. It uses ldapsearch command and returns empty output if the cluster does not use LDAP.
 .TP
 .B --whodat2
 Show users informations by name. It uses ldapsearch command and returns empty output if the cluster does not use LDAP.

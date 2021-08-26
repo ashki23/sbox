@@ -13,41 +13,43 @@ Interactive command uses Slurm srun and sbatch commands to request resources int
 Show this help message and exit.
 .TP
 .B -A, --account 
-Slurm account name or project id.
+Slurm account name or project ID.
 .TP
 .B -n, --ntasks
- Number of tasks (cpus).
+Number of tasks (cpus).
 .TP
 .B -N, --nodes
- Number of nodes.
+Number of nodes.
 .TP
 .B -p, --partition
- Partition name.
+Partition name.
 .TP
 .B -t, --time
- Number of hours based on the partitions time limits.
+Number of hours based on the partitions time limits.
 .TP
 .B -l, --license
- Add a license to an interactive session.
+Add a license to an interactive session.
 .TP
 .B -m, --mem
- Amount of memory per GB.
+Amount of memory per GB.
 .TP
 .B -g, --gpu
- Number of gpus.
+Number of gpus.
 .TP
 .B -k, --kernel
- Jupyter kernel for python, r, julia. The default kernel is python.
+Jupyter kernel for python, r, julia. The default kernel is python.
 .TP
 .B -e, --environment
- Python environment(s) for a JupyterLab session.
+Virtual environment(s) for a JupyterLab session.
+.TP
+.B -y, --myenv
+Path to a local virtual environment. The local virtual envs should contain JupyterLab.
 .PP
 \f[B]Examples
 .PP
 Use the cluster interactively:
 .IP
 .nf
-[user\[at]lewis4-r630-login-node675 bin]$ module load sbox
 [user\[at]lewis4-r630-login-node675 \[ti]]$ interactive
 Logging into Interactive partition with 2G memory, 1 cpu for 2 hours ... 
 [user\[at]lewis4-r7425-htc5-node835 \[ti]]$ 

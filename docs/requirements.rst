@@ -198,7 +198,7 @@ Or adding a tcl modulefile similar to the above tcl template for Anaconda.
 Note that the first time that users run ``interactive jupyter -k julia``,
 Julia Jupyter kernal (IJulia) will be installed under ``~/.julia``.
 
-On demand Python pakages
+On demand Python and R pakages
 ------------------------
 
 Popular Python pakages that are not available in Anaconda can be added
@@ -215,13 +215,20 @@ Similarly, we can create a PyTorch (PT) env with:
 
 .. code:: bash
 
-   cd /<cluster software path>/anaconda/<year.month> 
+   cd /<cluster software path>/anaconda/<year.month>
    ./bin/conda create -n pytorch-<version> anaconda
    ./bin/conda install -n pytorch-<version> -c pytorch pytorch gpustat
 
+For instance, we can collect set of popular R bio packages in the following env from bioconda channel:
+
+.. code:: bash
+
+   cd /<cluster software path>/anaconda/<year.month>
+   ./bin/conda create -n r-bioessentials-<version> -c bioconda -c conda-forge bioconductor-edger bioconductor-oligo r-monocle3 r-signac r-seurat scanpy macs2 jupyterlab r-irkernel
+
 In the above lines, ``<cluster software path>`` and ``<year.month>``
 should be updated based on the Anaconda path and ``<version>``
-(e.g. ``2.4.1``) based on the version of TF or PT.
+(e.g. ``2.4.1``) based on the version of TF, PT, and R.
 
 For each env, we need to add a modulefile to
 ``$MODULEPATH/<env name>/<version>.lua``. For instance
@@ -288,7 +295,7 @@ The config file includes:
    quality of services.
 -  ``kernel_module``: A dictionary of kernels and the corresponding modules.
    A Python kernel is required (review `here <https://sbox.readthedocs.io/en/latest/requirements.html#python-kernel-anaconda>`__).
--  ``env_module``: A dictionary of Python virtual environments and the corresponding modules.
+-  ``env_module``: A dictionary of virtual environments and the corresponding modules.
 
 For example:
 
@@ -304,18 +311,18 @@ For example:
        "Gpu": 2
        },
        "jupyter_partition_timelimit": {
-       "Lewis": 8,
-       "hpc4": 8,
-       "hpc5": 8,
-       "hpc6": 8,
-       "gpu3": 8,
-       "gpu4": 8,
-       "Gpu": 2
+	  "Lewis": 8,
+	  "hpc4": 8,
+	  "hpc5": 8,
+	  "hpc6": 8,
+	  "gpu3": 8,
+	  "gpu4": 8,
+	  "Gpu": 2
        },
        "partition_qos": {
-       "Interactive": "interactive",
-       "Serial": "seriallong",
-       "Dtn": "dtn"
+	  "Interactive": "interactive",
+	  "Serial": "seriallong",
+	  "Dtn": "dtn"
        },
        "kernel_module": {
            "python": "anaconda",
@@ -323,8 +330,9 @@ For example:
            "julia": "julia"
        },
        "env_module": {
-       "tensorflow-v1.9": "tensorflow/1.9.0",
-       "tensorflow": "tensorflow",
-       "pytorch": "pytorch"
+	  "tensorflow-v1.9": "tensorflow/1.9.0",
+	  "tensorflow": "tensorflow",
+	  "pytorch": "pytorch",
+	  "r-bio": "r-bioessentials"
        }
    }

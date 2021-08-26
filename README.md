@@ -40,6 +40,7 @@ Sbox is a toolbox for Slurm that provides information about users' accounts and 
 - `--history`: Return jobs history for last day, week, month or year. It requires one of the day/week/month/year options as an argument. It uses Slurm `sacct` command and returns empty output if the cluster does not use Slurm for users' account management.
 - `--pending`: Return user's pending jobs by using Slurm `squeue` command.
 - `--running`: Return user's running jobs by using Slurm `squeue` command.
+- `--cancel`: Cancel jobs by a single ID or a comma separated list of IDs using Slurm `scancel` command.
 - `--qos`: Show user's quality of services (QOS) and a list of available QOS in the cluster. It uses Slurm `sacctmgr show assoc` command and returns empty output if the cluster does not use Slurm for users' account management.
 - `--quota`: Return user's disk quotas. It uses `lfs quota` command for LFS systems and Unix `df` command for NFS systems. It returns pooled size of the disk if the cluster does not have user/group storage accounts.
 - `--ncpu`: Show number of available cpus on the cluster using Slurm `sinfo` command.
@@ -48,7 +49,7 @@ Sbox is a toolbox for Slurm that provides information about users' accounts and 
 - `--license`: Show available license servers using Slurm `scontrol` command.
 - `--reserve`: Show Slurm reservations using Slurm `scontrol` command.
 - `--topusage`: Show top usage users using Slurm `sreport` command.
-- `--whodat`: Show users informations by uid. It uses `ldapsearch` command and returns empty output if the cluster does not use LDAP.
+- `--whodat`: Show users informations by UID. It uses `ldapsearch` command and returns empty output if the cluster does not use LDAP.
 - `--whodat2`: Show users informations by name. It uses `ldapsearch`command and returns empty output if the cluster does not use LDAP.
 - `--agent`: Start, stop and list user's ssh-agents on the current host. It requires one of the start/stop/list options as an argument. Use `ssh -o StrictHostKeyChecking=no` to disable asking for host key acceptances.
 
@@ -171,7 +172,7 @@ Partition Gpu has 383 cpus available out of 412 (93%)
 ### Command line options
 
 - `-h, --help`: Show this help message and exit.
-- `-A, --account`: Slurm account name or project id.
+- `-A, --account`: Slurm account name or project ID.
 - `-n, --ntasks`: Number of tasks (cpus).
 - `-N, --nodes`: Number of nodes.
 - `-p, --partition`: Partition name.
@@ -180,14 +181,14 @@ Partition Gpu has 383 cpus available out of 412 (93%)
 - `-m, --mem`: Amount of memory per GB.
 - `-g, --gpu`: Number of gpus.
 - `-k, --kernel`: Jupyter kernel for python, r, julia. The default kernel is python.
-- `-e, --environment`: Python environment(s) for a JupyterLab session.
+- `-e, --environment`: Virtual environment(s) for a JupyterLab session.
+- `-y , --myenv`: Path to a local virtual environment. The local virtual envs should contain JupyterLab.
 
 **Examples**
 
 Use the cluster interactively:
 
 ```bash
-[user@lewis4-r630-login-node675 bin]$ module load sbox
 [user@lewis4-r630-login-node675 ~]$ interactive
 Logging into Interactive partition with 2G memory, 1 cpu for 2 hours ... 
 [user@lewis4-r7425-htc5-node835 ~]$ 
@@ -421,7 +422,7 @@ Or adding a tcl modulefile similar to the above tcl template for Anaconda.
 
 Note that the first time that users run `interactive jupyter -k julia`, Julia Jupyter kernal (IJulia) will be installed under `~/.julia`.
 
-### On demand Python pakages
+### On demand Python and R pakages
 
 Popular Python pakages that are not available in Anaconda can be added to `interactive jupyter -e`. For instance the following shows how to create a TensorFlow (TF) env:
 
@@ -439,10 +440,15 @@ cd /<cluster software path>/anaconda/<year.month>
 ./bin/conda install -n pytorch-<version> -c pytorch pytorch gpustat
 ```
 
-In the above lines, `<cluster software path>` and `<year.month>` should be updated based on the Anaconda path and `<version>` (e.g. `2.4.1`) based on the version of TF or PT.
+For instance, we collect set of popular R bio packages in the following env from bioconda channel:
+```bash
+cd /<cluster software path>/anaconda/<year.month>
+./bin/conda create -n r-bioessentials-<version> -c bioconda -c conda-forge bioconductor-edger bioconductor-oligo r-monocle3 r-signac r-seurat scanpy macs2 jupyterlab r-irkernel
+```
+
+In the above lines, `<cluster software path>` and `<year.month>` should be updated based on the Anaconda path and `<version>` (e.g. `2.4.1`) based on the version of TF, PT, and R.
 
 For each env, we need to add a modulefile to `$MODULEPATH/<env name>/<version>.lua`. For instance `$MODULEPATH/tensorflow/<version>.lua` is:
-
 
 ```lua
 -- -*- lua -*-
@@ -468,7 +474,6 @@ setenv("ANACONDA_ROOT", this_root)
 ```
 
 Or adding a tcl modulefile similar to the above tcl template for Anaconda.
-
 
 ## Configuration
 
@@ -497,7 +502,7 @@ The config file includes:
 - `jupyter_partition_timelimit`: A dictionary of computational/gpu partitions that users can run Jupter servers interactively and their time limits (hour). The first input is considered as the default partition.
 - `partition_qos`: A dictionary of partitions and the corresponding quality of services.
 - `kernel_module`: A dictionary of kernels and the corresponding modules. A Python kernel is required (review the Requirments).
-- `env_module`: A dictionary of Python virtual environments and the corresponding modules.
+- `env_module`: A dictionary of virtual environments and the corresponding modules.
 
 For example:
 
@@ -533,7 +538,8 @@ For example:
     "env_module": {
 	"tensorflow-v1.9": "tensorflow/1.9.0",
 	"tensorflow": "tensorflow",
-	"pytorch": "pytorch"
+	"pytorch": "pytorch",
+	"r-bio": "r-bioessentials"
     }
 }
 ```
