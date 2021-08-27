@@ -38,7 +38,7 @@ home = os.getenv('HOME').strip()
 host_name = os.popen('hostname').read().strip()
 
 parser = argparse.ArgumentParser(description = 'An alias for using cluster interactively', formatter_class = lambda prog: argparse.HelpFormatter(prog,max_help_position = 56))
-parser.add_argument('-A', '--account', help = 'slurm account name or project id', metavar = '')
+parser.add_argument('-a', '--account', help = 'slurm account name or project id', metavar = '')
 parser.add_argument('-n', '--ntasks', type = int, default = 1, help = 'number of tasks (cpus)', metavar = '')
 parser.add_argument('-N', '--nodes', type = int, default = 1, help = 'number of nodes', metavar = '')
 if 'jupyter' in sys.argv:
@@ -57,15 +57,15 @@ if 'jupyter' in sys.argv:
         parser.add_argument('-k', '--kernel', choices = kernel_all, default = 'python', help = f"Jupyter kernel for {', '.join(kernel_all)}", metavar = '')
     if len(env) > 0:
         parser.add_argument('-e', '--environment', choices = env, help = f"virtual environment(s) for {', '.join(env)}", metavar = '')
-    parser.add_argument('-y', '--myenv', help = 'path to a local virtual environment', metavar = '')
+    parser.add_argument('-E', '--myenv', help = 'path to a local virtual environment', metavar = '')
 else:
     parser.add_argument('-p', '--partition', choices = interactive_partition, default = interactive_partition[0], help = 'partition name', metavar = '')
     parser.add_argument('-t', '--time', type = int, choices = range(1, interactive_timelimt + 1), default = 2, help = f'number of hours (up to {interactive_timelimt})', metavar = '')
     parser.epilog = 'Command should be run from the login node.'
 parser.add_argument('-l', '--license', help = 'license', metavar = '')
-parser.add_argument('-m', '--mem', type = int, default = 2, help = 'amount of memory per GB', metavar = '')
+parser.add_argument('-m', '--mem', type = int, default = 2, help = 'amount of memory (per gb)', metavar = '')
 parser.add_argument('-g', '--gpu', type = int, default = 0, choices = range(3), help = 'number of gpus', metavar = '')
-parser.add_argument('interface', nargs = '?', choices = ['jupyter'], help = 'Starting Jupyter server on the cluster')
+parser.add_argument('interface', nargs = '?', choices = ['jupyter'], help = 'starting a jupyter server on the cluster')
 args = parser.parse_args()
 
 if args.partition in config['partition_qos'].keys():
