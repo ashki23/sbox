@@ -1,5 +1,5 @@
 Sbox
-=====
+----
 
 ``sbox`` command includes various Slurm commands at one place. Users can
 use different options to find the information about the cluster and
@@ -11,7 +11,7 @@ the cluster via ssh without asking for the passphrase (you need the
 passphrase to start the ssh-agent).
 
 Command line options
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 -  ``-h, --help``: Show the help message and exit.
 -  ``-a, --account``: Return user’s Slurm accounts by using Slurm
@@ -46,16 +46,16 @@ Command line options
    command.
 -  ``--running``: Return user’s running jobs by using Slurm ``squeue``
    command.
-- ``--cancel``: Cancel jobs by a single ID or a comma separated list of 
-  IDs using Slurm ``scancel`` command.
+-  ``--cancel``: Cancel jobs by a single ID or a comma separated list of
+   IDs using Slurm ``scancel`` command.
 -  ``--qos``: Show user’s quality of services (QOS) and a list of
    available QOS in the cluster. It uses Slurm ``sacctmgr show assoc``
-   command and returns empty output if the cluster does not use Slurm for
-   users’ account management.
--  ``--quota``: Return user’s disk quotas. It uses ``lfs quota``
-   command for LFS systems and Unix ``df`` command for NFS systems. It
-   returns pooled size of the disk if the cluster does not have
-   user/group storage accounts.
+   command and returns empty output if the cluster does not use Slurm
+   for users’ account management.
+-  ``--quota``: Return user’s disk quotas. It uses ``lfs quota`` command
+   for LFS systems and Unix ``df`` command for NFS systems. It returns
+   pooled size of the disk if the cluster does not have user/group
+   storage accounts.
 -  ``--ncpu``: Show number of available cpus on the cluster using Slurm
    ``sinfo`` command.
 -  ``--ncgu``: Show number of available gpus on the cluster using Slurm
@@ -67,10 +67,11 @@ Command line options
 -  ``--reserve``: Show Slurm reservations using Slurm ``scontrol``
    command.
 -  ``--topusage``: Show top usage users using Slurm ``sreport`` command.
-- ``--whodat``: Show users informations by UID. It uses ``ldapsearch``
-  command and returns empty output if the cluster does not use LDAP.
-- ``--whodat2``: Show users informations by name. It uses ``ldapsearch``
-  command and returns empty output if the cluster does not use LDAP.
+-  ``--whodat``: Show users informations by UID. It uses ``ldapsearch``
+   command and returns empty output if the cluster does not use LDAP.
+-  ``--whodat2``: Show users informations by name. It uses
+   ``ldapsearch``\ command and returns empty output if the cluster does
+   not use LDAP.
 -  ``--agent``: Start, stop and list user’s ssh-agents on the current
    host. It requires one of the start/stop/list options as an argument.
    Use ``ssh -o StrictHostKeyChecking=no`` to disable asking for host
@@ -83,16 +84,16 @@ Jobs histoty:
 .. code:: bash
 
    [user@lewis4-r630-login-node675 ~]$ sbox --hist day
-   -------------------------------------------------------------------------------- Jobs History - Last Day --------------------------------------------------------------------------------
-        JobID   User Account      State Partition     QOS NCPU NNod ReqMem              Submit   Reserved               Start    Elapsed                 End             NodeList    JobName 
-   ---------- ------ ------- ---------- --------- ------- ---- ---- ------ ------------------- ---------- ------------------- ---------- ------------------- -------------------- ---------- 
-     23126125  user  general  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:05   00:00:00 2021-07-28T01:25:05   00:00:03 2021-07-28T01:25:08 lewis4-c8k-hpc2-nod+       bash 
-     23126126  user  general  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:13   00:00:00 2021-07-28T01:25:13   00:00:03 2021-07-28T01:25:16 lewis4-c8k-hpc2-nod+       bash 
-     23126127  user  general  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:20   00:00:00 2021-07-28T01:25:20   00:00:08 2021-07-28T01:25:28 lewis4-c8k-hpc2-nod+       bash 
-     23126128  user  genera+  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:49   00:00:00 2021-07-28T01:25:49   00:00:03 2021-07-28T01:25:52 lewis4-c8k-hpc2-nod+       bash 
-     23126129  user  genera+  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:26:05   00:00:00 2021-07-28T01:26:05   00:00:06 2021-07-28T01:26:11 lewis4-c8k-hpc2-nod+       bash 
-     23126130  user  genera+  COMPLETED       Gpu  normal    1    1    2Gn 2021-07-28T01:26:38   00:00:02 2021-07-28T01:26:40   00:00:11 2021-07-28T01:26:51 lewis4-z10pg-gpu3-n+       bash 
-     23126131  user  genera+ CANCELLED+       Gpu  normal    1    1    2Gn 2021-07-28T01:27:43   00:00:01 2021-07-28T01:27:44   00:01:03 2021-07-28T01:28:47 lewis4-z10pg-gpu3-n+ jupyter-py 
+   -------------------------------------------------------------------------------- Jobs History - Last Day ---------------------------------------------------------------------
+        JobID   User Account      State Partition     QOS NCPU NNod ReqMem              Submit   Reserved               Start    Elapsed                 End             NodeList
+   ---------- ------ ------- ---------- --------- ------- ---- ---- ------ ------------------- ---------- ------------------- ---------- ------------------- --------------------
+     23126125  user  general  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:05   00:00:00 2021-07-28T01:25:05   00:00:03 2021-07-28T01:25:08 lewis4-c8k-hpc2-nod+
+     23126126  user  general  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:13   00:00:00 2021-07-28T01:25:13   00:00:03 2021-07-28T01:25:16 lewis4-c8k-hpc2-nod+
+     23126127  user  general  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:20   00:00:00 2021-07-28T01:25:20   00:00:08 2021-07-28T01:25:28 lewis4-c8k-hpc2-nod+
+     23126128  user  genera+  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:49   00:00:00 2021-07-28T01:25:49   00:00:03 2021-07-28T01:25:52 lewis4-c8k-hpc2-nod+
+     23126129  user  genera+  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:26:05   00:00:00 2021-07-28T01:26:05   00:00:06 2021-07-28T01:26:11 lewis4-c8k-hpc2-nod+
+     23126130  user  genera+  COMPLETED       Gpu  normal    1    1    2Gn 2021-07-28T01:26:38   00:00:02 2021-07-28T01:26:40   00:00:11 2021-07-28T01:26:51 lewis4-z10pg-gpu3-n+
+     23126131  user  genera+ CANCELLED+       Gpu  normal    1    1    2Gn 2021-07-28T01:27:43   00:00:01 2021-07-28T01:27:44   00:01:03 2021-07-28T01:28:47 lewis4-z10pg-gpu3-n+
 
 Jobs efficiency for running and compeleted jobs:
 
@@ -100,10 +101,10 @@ Jobs efficiency for running and compeleted jobs:
 
    [user@lewis4-r630-login-node675 ~]$ sbox --eff 23227816
    ------------------------------------- Job Efficiency -------------------------------------
-   PID   USER      PR  NI    VIRT   RES      SHR  S   %CPU   %MEM   TIME+   COMMAND
-   47262 user      20   0  115700   3888     1600 S   0.0    0.0    0:00.03 bash
-   47346 user      20   0  113292   149298   1256 S   99.0   23.0   0:13.30 python
-   
+      PID USER      PR  NI    VIRT    RES     SHR  S   %CPU   %MEM   TIME+   COMMAND
+    47262 user      20   0  115700   3888     1600 S   0.0    0.0    0:00.03 bash
+    47346 user      20   0  113292   149298   1256 S   99.0   23.0   0:13.30 python
+
    RES: shows resident memory which is accurate representation of how much actual physical memory a process is consuming
    %CPU: shows the percentage of the CPU that is being used by the process
 
@@ -114,7 +115,7 @@ Jobs efficiency for running and compeleted jobs:
    Job ID: 23126131
    Cluster: lewis4
    User/Group: user/user
-   State: CANCELLED (exit code 0)
+   State: COMPLETED (exit code 0)
    Cores: 1
    CPU Utilized: 00:11:01
    CPU Efficiency: 48.59% of 00:21:03 core-walltime
@@ -191,43 +192,48 @@ Cluster resources:
    Partition Gpu has 383 cpus available out of 412 (93%)
 
 Interactive
-============
+-----------
 
 ``interactive`` is an alias for using cluster interactively using Slurm
 ``srun`` and ``sbatch`` commands. The ``interactive jupyter`` provides a
 JupyterLab interface for using scientific software including Python, R,
-Julia, and their libraries. The command submits a batch file and runs a
-Jupyter server on the cluster. Multiple kernels and environments can be
-applied to use different software and packages in JupyterLab.
+Julia, and their libraries. The command submits a batch file by
+``sbatch`` command and runs a Jupyter server on the cluster. Multiple
+kernels and environments can be applied to use different software and
+packages in JupyterLab.
+
+.. _command-line-options-1:
 
 Command line options
---------------------
+~~~~~~~~~~~~~~~~~~~~
 
 -  ``-h, --help``: Show this help message and exit.
--  ``-A, --account``: Slurm account name or project ID.
+-  ``-a, --account``: Slurm account name or project ID.
 -  ``-n, --ntasks``: Number of tasks (cpus).
 -  ``-N, --nodes``: Number of nodes.
 -  ``-p, --partition``: Partition name.
--  ``-t, --time``: Number of hours based on the partitions time limits.
+-  ``-t, --time``: Number of hours based on the partitions timelimit.
 -  ``-l, --license``: Add a license to an interactive session.
--  ``-m, --mem``: Amount of memory per GB.
+-  ``-m, --mem``: Amount of memory (per GB).
 -  ``-g, --gpu``: Number of gpus.
--  ``-k, --kernel``: Jupyter kernel for python, r, julia. The default kernel is python.
--  ``-e, --environment``: Virtual environment(s) for a JupyterLab session.
--  ``-y , --myenv``: Path to a local virtual environment. The local virtual envs should contain JupyterLab.
+-  ``-k, --kernel``: Jupyter kernel for python, r, julia. The default
+   kernel is python.
+-  ``-e, --environment``: Virtual environment(s) for a JupyterLab
+   session.
+-  ``-E, --myenv``: Path to a local virtual environment. The local
+   virtual envs should contain JupyterLab.
 
 **Examples**
 
-Use the cluster interactively:
+Using the cluster interactively:
 
 .. code:: bash
 
-   [user@lewis4-r630-login-node675 bin]$ module load sbox
    [user@lewis4-r630-login-node675 ~]$ interactive
    Logging into Interactive partition with 2G memory, 1 cpu for 2 hours ... 
    [user@lewis4-r7425-htc5-node835 ~]$ 
 
-Use the cluster interactively with more time and resources:
+Using the cluster interactively with more time and resources:
 
 .. code:: bash
 
@@ -235,7 +241,7 @@ Use the cluster interactively with more time and resources:
    Logging into Interactive partition with 16G memory, 6 cpu for 4 hours ... 
    [user@lewis4-r7425-htc5-node835 ~]$
 
-Use the cluster interactively with a license:
+Using the cluster interactively with a license:
 
 .. code:: bash
 
@@ -243,7 +249,7 @@ Use the cluster interactively with a license:
    Logging into Interactive partition with 16G memory, 6 cpu for 4 hours with a matlab license ... 
    [user@lewis4-r7425-htc5-node835 ~]$
 
-Use a Gpu interactively:
+Using a Gpu interactively:
 
 .. code:: bash
 
@@ -251,7 +257,7 @@ Use a Gpu interactively:
    Logging into Gpu partition with 1 gpu, 2G memory, 1 cpu for 2 hours ... 
    [user@lewis4-r730-gpu3-node431 ~]$
 
-Use JupyterLab:
+Using JupyterLab:
 
 .. code:: bash
 
@@ -272,25 +278,57 @@ Use JupyterLab:
    To stop the server run the following on the cluster:
    scancel 23150533
 
-Use TensorFlow with JupyterLab:
+Using JupyterLab with R kernel:
 
 .. code:: bash
 
-   [user@lewis4-r630-login-node675 ~]$ interactive jupyter -A general-gpu -p gpu3 --mem 16 -t 8 -e tensorflow
-   Logging into gpu3 partition with 1 gpu, 16G memory, 1 cpu for 8 hours with account general-gpu ...
-   Starting Jupyter server (it might take about a couple minutes) ...
-   Starting Jupyter server ...
-   Starting Jupyter server ...
-   ...
-
-Use R with JupyterLab:
-
-.. code:: bash
-
-   interactive jupyter -k r
+   [user@lewis4-r630-login-node675 ~]$ interactive jupyter -k r
    Logging into Lewis partition with 2G memory, 1 cpu for 2 hours ...
    Starting Jupyter server (it might take about a couple minutes) ...
    Starting Jupyter server ...
    Starting Jupyter server ...
    ...
 
+Using TensorFlow on JupyterLab by a different account and on a partition
+with 16 GB memory for 8 hours:
+
+.. code:: bash
+
+   [user@lewis4-r630-login-node675 ~]$ interactive jupyter -a general-gpu -p gpu3 --mem 16 -t 8 -e tensorflow
+   Logging into gpu3 partition with 1 gpu, 16G memory, 1 cpu for 8 hours with account general-gpu ...
+   Starting Jupyter server (it might take about a couple minutes) ...
+   Starting Jupyter server ...
+   Starting Jupyter server ...
+   ...
+
+**Note**: Users can install other packages and mix local packages with
+the premade environments. For example, for Python:
+
+.. code:: bash
+
+   pip install --target </path/my-packages/lib/> <pkg-name>
+   export PYTHONPATH=</path/my-packages/lib/>:$PYTHONPATH
+
+For R, run the following in R:
+
+.. code:: r
+
+   dir.create("<your/path/for/R/version>")
+   install.packages("<pkg-name>", repos = "http://cran.us.r-project.org", lib = "<your/path/for/R/version>")
+   .libPaths("<your/path/for/R/version>")
+
+Using a local virtual environment:
+
+.. code:: bash
+
+   [user@lewis4-r630-login-node675 ~]$ interactive jupyter -E </path/to/local/env>
+   Logging into Lewis partition with 2G memory, 1 cpu for 2 hours ...
+   Starting Jupyter server (it might take about a couple minutes) ...
+   Starting Jupyter server ...
+
+**Note**: The local environments must include ``jupyterlab``. For R
+environments, they must also contain ``r-irkernel``. For instance:
+
+.. code:: bash
+
+   conda create -p </path/to/local/env> -c conda-forge r-base jupyterlab r-irkernel

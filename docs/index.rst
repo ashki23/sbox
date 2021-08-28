@@ -12,12 +12,13 @@ Features
 * Facilitate request resources interactively.
 * Easy ability to start a JupyerLab session.
 * JupyterLab interface with multiple kernels.
-* JupyterLab interface with access to virtual environments for Python libraries such as TensorFlow and PyTorch .
-* Easy to set up and configure. It cab be installed in the user level or cluster-wide
+* JupyterLab interface with access to premade virtual environments such as TensorFlow and PyTorch.
+* JupyterLab interface with access to a local virtual environments.
+* Easy to set up and configure. It can be installed in the user level or cluster-wide.
 * Explanatory help options (``--help``) and reference manuals (``man sbox, man interactive``).
 * Improving ``seff`` command by using ``top`` command for showing the running jobs efficiency.
 * Managing users ssh-agent to be able to communicate with clients outside (e.g. GitHub) or within the cluster (other nodes) without asking for the passphrase.
-* Helping users by showing their fairshares, accounts, quotas, jobs' efficiencies and history, running and pending jobs, as well as  the cluster resources.
+* Helping users by showing their fairshares, accounts, quotas, jobs' history, running and pending jobs, as well as cluster resources.
 
 Install
 -------

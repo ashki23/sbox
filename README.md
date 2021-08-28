@@ -8,12 +8,13 @@ Sbox is a toolbox for Slurm that provides information about users' accounts and 
 - Facilitate request resources interactively.
 - Easy ability to start a JupyerLab session.
 - JupyterLab interface with multiple kernels.
-- JupyterLab interface with access to virtual environments for Python libraries such as TensorFlow and PyTorch .
-- Easy to set up and configure. It cab be installed in the user level or cluster-wide
+- JupyterLab interface with access to premade virtual environments such as TensorFlow and PyTorch.
+- JupyterLab interface with access to a local virtual environments.
+- Easy to set up and configure. It can be installed in the user level or cluster-wide.
 - Explanatory help options (`--help`) and reference manuals (`man sbox, man interactive`).
 - Improving `seff` command by using `top` command for showing the running jobs efficiency.
 - Managing users ssh-agent to be able to communicate with clients outside (e.g. GitHub) or within the cluster (other nodes) without asking for the passphrase.
-- Helping users by showing their fairshares, accounts, quotas, jobs' efficiencies and history, running and pending jobs, as well as  the cluster resources.
+- Helping users by showing their fairshares, accounts, quotas, jobs' history, running and pending jobs, as well as cluster resources.
 
 ## Commands
 
@@ -59,16 +60,16 @@ Jobs histoty:
 
 ```bash
 [user@lewis4-r630-login-node675 ~]$ sbox --hist day
--------------------------------------------------------------------------------- Jobs History - Last Day --------------------------------------------------------------------------------
-     JobID   User Account      State Partition     QOS NCPU NNod ReqMem              Submit   Reserved               Start    Elapsed                 End             NodeList    JobName 
----------- ------ ------- ---------- --------- ------- ---- ---- ------ ------------------- ---------- ------------------- ---------- ------------------- -------------------- ---------- 
-  23126125  user  general  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:05   00:00:00 2021-07-28T01:25:05   00:00:03 2021-07-28T01:25:08 lewis4-c8k-hpc2-nod+       bash 
-  23126126  user  general  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:13   00:00:00 2021-07-28T01:25:13   00:00:03 2021-07-28T01:25:16 lewis4-c8k-hpc2-nod+       bash 
-  23126127  user  general  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:20   00:00:00 2021-07-28T01:25:20   00:00:08 2021-07-28T01:25:28 lewis4-c8k-hpc2-nod+       bash 
-  23126128  user  genera+  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:49   00:00:00 2021-07-28T01:25:49   00:00:03 2021-07-28T01:25:52 lewis4-c8k-hpc2-nod+       bash 
-  23126129  user  genera+  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:26:05   00:00:00 2021-07-28T01:26:05   00:00:06 2021-07-28T01:26:11 lewis4-c8k-hpc2-nod+       bash 
-  23126130  user  genera+  COMPLETED       Gpu  normal    1    1    2Gn 2021-07-28T01:26:38   00:00:02 2021-07-28T01:26:40   00:00:11 2021-07-28T01:26:51 lewis4-z10pg-gpu3-n+       bash 
-  23126131  user  genera+ CANCELLED+       Gpu  normal    1    1    2Gn 2021-07-28T01:27:43   00:00:01 2021-07-28T01:27:44   00:01:03 2021-07-28T01:28:47 lewis4-z10pg-gpu3-n+ jupyter-py 
+-------------------------------------------------------------------------------- Jobs History - Last Day ---------------------------------------------------------------------
+     JobID   User Account      State Partition     QOS NCPU NNod ReqMem              Submit   Reserved               Start    Elapsed                 End             NodeList
+---------- ------ ------- ---------- --------- ------- ---- ---- ------ ------------------- ---------- ------------------- ---------- ------------------- --------------------
+  23126125  user  general  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:05   00:00:00 2021-07-28T01:25:05   00:00:03 2021-07-28T01:25:08 lewis4-c8k-hpc2-nod+
+  23126126  user  general  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:13   00:00:00 2021-07-28T01:25:13   00:00:03 2021-07-28T01:25:16 lewis4-c8k-hpc2-nod+
+  23126127  user  general  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:20   00:00:00 2021-07-28T01:25:20   00:00:08 2021-07-28T01:25:28 lewis4-c8k-hpc2-nod+
+  23126128  user  genera+  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:25:49   00:00:00 2021-07-28T01:25:49   00:00:03 2021-07-28T01:25:52 lewis4-c8k-hpc2-nod+
+  23126129  user  genera+  COMPLETED Interact+ intera+    1    1    2Gn 2021-07-28T01:26:05   00:00:00 2021-07-28T01:26:05   00:00:06 2021-07-28T01:26:11 lewis4-c8k-hpc2-nod+
+  23126130  user  genera+  COMPLETED       Gpu  normal    1    1    2Gn 2021-07-28T01:26:38   00:00:02 2021-07-28T01:26:40   00:00:11 2021-07-28T01:26:51 lewis4-z10pg-gpu3-n+
+  23126131  user  genera+ CANCELLED+       Gpu  normal    1    1    2Gn 2021-07-28T01:27:43   00:00:01 2021-07-28T01:27:44   00:01:03 2021-07-28T01:28:47 lewis4-z10pg-gpu3-n+
 ```
 
 Jobs efficiency for running and compeleted jobs:
@@ -76,7 +77,7 @@ Jobs efficiency for running and compeleted jobs:
 ```bash
 [user@lewis4-r630-login-node675 ~]$ sbox --eff 23227816
 ------------------------------------- Job Efficiency -------------------------------------
-   PID USER      PR  NI    VIRT    RES     SHR  S   %CPU   %MEM   TIME+ COMMAND
+   PID USER      PR  NI    VIRT    RES     SHR  S   %CPU   %MEM   TIME+   COMMAND
  47262 user      20   0  115700   3888     1600 S   0.0    0.0    0:00.03 bash
  47346 user      20   0  113292   149298   1256 S   99.0   23.0   0:13.30 python
 
@@ -172,21 +173,21 @@ Partition Gpu has 383 cpus available out of 412 (93%)
 ### Command line options
 
 - `-h, --help`: Show this help message and exit.
-- `-A, --account`: Slurm account name or project ID.
+- `-a, --account`: Slurm account name or project ID.
 - `-n, --ntasks`: Number of tasks (cpus).
 - `-N, --nodes`: Number of nodes.
 - `-p, --partition`: Partition name.
 - `-t, --time`: Number of hours based on the partitions timelimit.
 - `-l, --license`: Add a license to an interactive session.
-- `-m, --mem`: Amount of memory per GB.
+- `-m, --mem`: Amount of memory (per GB).
 - `-g, --gpu`: Number of gpus.
 - `-k, --kernel`: Jupyter kernel for python, r, julia. The default kernel is python.
 - `-e, --environment`: Virtual environment(s) for a JupyterLab session.
-- `-y , --myenv`: Path to a local virtual environment. The local virtual envs should contain JupyterLab.
+- `-E, --myenv`: Path to a local virtual environment. The local virtual envs should contain JupyterLab.
 
 **Examples**
 
-Use the cluster interactively:
+Using the cluster interactively:
 
 ```bash
 [user@lewis4-r630-login-node675 ~]$ interactive
@@ -194,7 +195,7 @@ Logging into Interactive partition with 2G memory, 1 cpu for 2 hours ...
 [user@lewis4-r7425-htc5-node835 ~]$ 
 ```
 
-Use the cluster interactively with more time and resources:
+Using the cluster interactively with more time and resources:
 
 ```bash
 [user@lewis4-r630-login-node675 ~]$ interactive --mem 16 -n 6 -t 4
@@ -202,7 +203,7 @@ Logging into Interactive partition with 16G memory, 6 cpu for 4 hours ...
 [user@lewis4-r7425-htc5-node835 ~]$
 ```
 
-Use the cluster interactively with a license:
+Using the cluster interactively with a license:
 
 ```bash
 [user@lewis4-r630-login-node675 ~]$ interactive --mem 16 -n 6 -t 4 -l matlab
@@ -210,7 +211,7 @@ Logging into Interactive partition with 16G memory, 6 cpu for 4 hours with a mat
 [user@lewis4-r7425-htc5-node835 ~]$
 ```
 
-Use a Gpu interactively:
+Using a Gpu interactively:
 
 ```bash
 [user@lewis4-r630-login-node675 ~]$ interactive -p Gpu
@@ -218,7 +219,7 @@ Logging into Gpu partition with 1 gpu, 2G memory, 1 cpu for 2 hours ...
 [user@lewis4-r730-gpu3-node431 ~]$
 ```
 
-Use JupyterLab:
+Using JupyterLab:
 ```bash
 [user@lewis4-r630-login-node675 ~]$ interactive jupyter
 Logging into Lewis partition with 2G memory, 1 cpu for 2 hours ...
@@ -238,19 +239,9 @@ To stop the server run the following on the cluster:
 scancel 23150533
 ```
 
-Use TensorFlow with JupyterLab:
+Using JupyterLab with R kernel:
 ```bash
-[user@lewis4-r630-login-node675 ~]$ interactive jupyter -A general-gpu -p gpu3 --mem 16 -t 8 -e tensorflow
-Logging into gpu3 partition with 1 gpu, 16G memory, 1 cpu for 8 hours with account general-gpu ...
-Starting Jupyter server (it might take about a couple minutes) ...
-Starting Jupyter server ...
-Starting Jupyter server ...
-...
-```
-
-Use R with JupyterLab:
-```bash
-interactive jupyter -k r
+[user@lewis4-r630-login-node675 ~]$ interactive jupyter -k r
 Logging into Lewis partition with 2G memory, 1 cpu for 2 hours ...
 Starting Jupyter server (it might take about a couple minutes) ...
 Starting Jupyter server ...
@@ -258,18 +249,56 @@ Starting Jupyter server ...
 ...
 ```
 
+Using TensorFlow on JupyterLab by a different account and on a partition with 16 GB memory for 8 hours:
+```bash
+[user@lewis4-r630-login-node675 ~]$ interactive jupyter -a general-gpu -p gpu3 --mem 16 -t 8 -e tensorflow
+Logging into gpu3 partition with 1 gpu, 16G memory, 1 cpu for 8 hours with account general-gpu ...
+Starting Jupyter server (it might take about a couple minutes) ...
+Starting Jupyter server ...
+Starting Jupyter server ...
+...
+```
+
+**Note**: Users can install other packages and mix local packages with the premade environments. For example, for Python:
+
+```bash
+pip install --target </path/my-packages/lib/> <pkg-name>
+export PYTHONPATH=</path/my-packages/lib/>:$PYTHONPATH
+```
+
+For R, run the following in R:
+
+```R
+dir.create("<your/path/for/R/version>")
+install.packages("<pkg-name>", repos = "http://cran.us.r-project.org", lib = "<your/path/for/R/version>")
+.libPaths("<your/path/for/R/version>")
+```
+
+Using a local virtual environment:
+```bash
+[user@lewis4-r630-login-node675 ~]$ interactive jupyter -E </path/to/local/env>
+Logging into Lewis partition with 2G memory, 1 cpu for 2 hours ...
+Starting Jupyter server (it might take about a couple minutes) ...
+Starting Jupyter server ...
+```
+**Note**: The local environments must include `jupyterlab`. For R environments, they must also contain `r-irkernel`. For instance:
+
+```bash
+conda create -p </path/to/local/env> -c conda-forge r-base jupyterlab r-irkernel
+```
+
 ## Quick install
 
 - Download and extract the [latest Sbox release](https://github.com/ashki23/sbox/releases/latest).
+- To access JupyerLab sessions, install Anaconda and create required virtual environments and modulefiles. Review "Requirements" to learn more.
 - Update the `config` file based on the cluster information. Review "Configuration" to learn more.
-- To access a JupyerLab session, install Anaconda and create the required virtual environments and modulefiles. Review "Requirements" to learn more.
-- Place a modulefile for Sbox under `$MODULEPATH/sbox` directory and load the module or add the Sbox bin directory to `$PATH`. A Sbox template modulefile can be found under `./templates/1.2.lua`.
+- Place a modulefile for Sbox under `$MODULEPATH/sbox` directory and load the module or add the Sbox bin directory to `$PATH`. A Sbox template modulefile can be found in [here](https://github.com/ashki23/sbox/blob/main/templates/1.2.lua).
 
 ## Requirements
 
 Sbox requires Slurm and Python >= 3.6.8. The `interactive jupyter` command requires Anaconda and an environment module system (e.g. [Lmod](https://lmod.readthedocs.io/en/latest/)) in addition to Slurm and Python. To use R and Julia in JupyterLab sessions, we need R and irkernel as well as Julia to be installed.
 
-Note that Sbox options require some other commands. Review the options requirement under the command line options.
+Note that Sbox options require some other commands. Review their requirements under the command line options.
 
 The following shows how to install Anaconda and create the required virtual envs and modulefiles.
 
@@ -351,7 +380,7 @@ cd /<cluster software path>/anaconda/<year.month>
 ./bin/conda create -n r-essentials-<R version> -c conda-forge r-essentials r-base r-irkernel jupyterlab
 ```
 
-In the above lines, `<cluster software path>` and `<year.month>` should be updated based on the Anaconda path and `<R version>` (e.g. `4.0.3`) based on the version of R in the env.
+In the above lines, `<cluster software path>` and `<year.month>` should be updated based on the Anaconda path and version, and `<R version>` (e.g. `4.0.3`) based on the version of R in the env.
 
 The following modulefile should be added to `$MODULEPATH/r-essentials/<R version>.lua` to be able to load the R env:
 
@@ -390,7 +419,7 @@ cd /<cluster software path>/anaconda/<year.month>
 ./bin/conda create -n julia-<version> -c conda-forge julia
 ```
 
-In the above lines, `<cluster software path>` and `<year.month>` should be updated based on the Anaconda path and `<version>` (e.g. `1.6.1`) based on the version of Julia in the env.
+In the above lines, `<cluster software path>` and `<year.month>` should be updated based on the Anaconda path and version, and `<version>` (e.g. `1.6.1`) based on the version of Julia in the env.
 
 The following modulefile should be added to `$MODULEPATH/julia/<version>.lua`:
 
@@ -440,13 +469,13 @@ cd /<cluster software path>/anaconda/<year.month>
 ./bin/conda install -n pytorch-<version> -c pytorch pytorch gpustat
 ```
 
-For instance, we collect set of popular R bio packages in the following env from bioconda channel:
+For instance, we can collect popular R bio packages in the following env from bioconda channel:
 ```bash
 cd /<cluster software path>/anaconda/<year.month>
 ./bin/conda create -n r-bioessentials-<version> -c bioconda -c conda-forge bioconductor-edger bioconductor-oligo r-monocle3 r-signac r-seurat scanpy macs2 jupyterlab r-irkernel
 ```
 
-In the above lines, `<cluster software path>` and `<year.month>` should be updated based on the Anaconda path and `<version>` (e.g. `2.4.1`) based on the version of TF, PT, and R.
+In the above lines, `<cluster software path>` and `<year.month>` should be updated based on the Anaconda path and version, and `<version>` (e.g. `2.4.1`) based on the version of TF, PT, or R.
 
 For each env, we need to add a modulefile to `$MODULEPATH/<env name>/<version>.lua`. For instance `$MODULEPATH/tensorflow/<version>.lua` is:
 
@@ -474,6 +503,8 @@ setenv("ANACONDA_ROOT", this_root)
 ```
 
 Or adding a tcl modulefile similar to the above tcl template for Anaconda.
+
+**Note**: Users can add other packages and mix a local stack of packages with the premade environments. For Python and R packages users can apply `pip install` and `install.packages` respectively to install packages on their home. In order to install packages in a differnt path than home, we can specify the desired path and add the new path to the library path of the software. See examples under the `interactive` command line options examples.
 
 ## Configuration
 
@@ -512,23 +543,23 @@ For example:
     "cpu_partition": ["Interactive","Lewis","Serial","Dtn","hpc3","hpc4","hpc4rc","hpc5","hpc6","General","Gpu"],
     "gpu_partition": ["Gpu","gpu3","gpu4"],
     "interactive_partition_timelimit": {
-	"Interactive": 4,
-	"Dtn": 4,
-	"Gpu": 2
+        "Interactive": 4,
+        "Dtn": 4,
+        "Gpu": 2
     },
     "jupyter_partition_timelimit": {
-	"Lewis": 8,
-	"hpc4": 8,
-	"hpc5": 8,
-	"hpc6": 8,
-	"gpu3": 8,
-	"gpu4": 8,
-	"Gpu": 2
+        "Lewis": 8,
+        "hpc4": 8,
+        "hpc5": 8,
+        "hpc6": 8,
+        "gpu3": 8,
+        "gpu4": 8,
+        "Gpu": 2
     },
     "partition_qos": {
-	"Interactive": "interactive",
-	"Serial": "seriallong",
-	"Dtn": "dtn"
+        "Interactive": "interactive",
+        "Serial": "seriallong",
+        "Dtn": "dtn"
     },
     "kernel_module": {
         "python": "anaconda",
@@ -536,10 +567,10 @@ For example:
         "julia": "julia"
     },
     "env_module": {
-	"tensorflow-v1.9": "tensorflow/1.9.0",
-	"tensorflow": "tensorflow",
-	"pytorch": "pytorch",
-	"r-bio": "r-bioessentials"
+        "tensorflow-v1.9": "tensorflow/1.9.0",
+        "tensorflow": "tensorflow",
+        "pytorch": "pytorch",
+        "r-bio": "r-bioessentials"
     }
 }
 ```

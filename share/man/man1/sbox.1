@@ -2,19 +2,15 @@
 .SH NAME
 sbox \- a simple toolbox for Slurm
 .SH SYNOPSIS
-.B sbox
-[\fB-h\fR] [\fB-a\fR] [\fB-f\fR] [\fB-g\fR] [\fB-q\fR] [\fB-j\fR JOBID] [\fB-c\fR] [\fB-p\fR] [\fB-u\fR UID] [\fB-v\fR]
-[\fB--eff\fR JOBID] [\fB--history\fR {day,week,month,year}] [\fB--pending\fR]
-[\fB--running\fR] [\fB--qos\fR] [\fB--quota\fR] [\fB--ncpu\fR] [\fB--ngpu\fR] [\fB--gpu\fR]
-[\fB--license\fR] [\fB--reserve\fR] [\fB--topusage\fR] [\fB--whodat\fR UID]
-[\fB--whodat2\fR UNAME] [\fB--agent\fR {start,stop,list}]
+sbox [-h] [-a] [-f] [-g] [-q] [-j JOBID] [-c] [-p] [-u UID] [-v] [--eff JOBID] [--history {day,week,month,year}] [--pending] [--running] [--cancel JOBID] [--qos] [--quota] [--ncpu] [--ngpu] [--gpu] [--license] [--reserve] [--topusage] [--whodat UID] [--whodat2 UNAME] [--agent {start,stop,list}]
 .br
 .SH DESCRIPTION
+.PP
 sbox command includes various Slurm commands at one place.
 Users can use different options to find the information about the
 cluster and their accounts and activities.
 Beyond the Slurm commands, sbox provides some Unix features
-including users groups, disk quotas and starting ssh agents.
+including users\[cq] groups, disk quotas and starting ssh agents.
 The ssh-agent lets users communicate with clients outside the cluster
 such as GitHub and GitLab or with other nodes within the cluster via ssh
 without asking for the passphrase (you need the passphrase to start the
@@ -25,83 +21,132 @@ ssh-agent).
 Show the help message and exit.
 .TP
 .B -a, --account
-Return users Slurm accounts by using Slurm sacctmgr. If the cluster does not use Slurm for users account management, it returns empty output.
+Return user\[cq]s Slurm accounts by using Slurm
+sacctmgr.
+If the cluster does not use Slurm for users\[cq] account management, it
+returns empty output.
 .TP
-.B -f, --fairshare 
-Return users fairshare by using Slurm sshare command. If the cluster does not follow a fairshare model, it returns empty output.
+.B -f, --fairshare
+Return users\[cq] fairshare by using Slurm
+sshare command.
+If the cluster does not follow a fairshare model, it returns empty
+output.
 .TP
-.B -g, --group 
-Return users posix groups by using Unix groups command.
+.B -g, --group
+Return user\[cq]s posix groups by using Unix
+groups command.
 .TP
-.B -q, --queue 
-Return users jobs in the Slurm queue by Slurm using squeue command.
+.B -q, --queue
+Return user\[cq]s jobs in the Slurm queue by
+Slurm using squeue command.
 .TP
-.B -j, --job 
-Show a running/pending job info by using Slurm scontrol command. It requires a valid job ID as argument.
+.B -j, --job
+Show a running/pending job info by using Slurm
+scontrol command.
+It requires a valid job ID as argument.
 .TP
-.B -c, --cpu 
-Return computational resources including number of cores and amount of memory on each node. It uses Slurm sjstat command.
+.B -c, --cpu
+Return computational resources including number of
+cores and amount of memory on each node.
+It uses Slurm sjstat command.
 .TP
-.B -p, --partition 
-Show cluster partitions by using Slurm sinfo command.
+.B -p, --partition
+Show cluster partitions by using Slurm
+sinfo command.
 .TP
-.B -u, --user 
-Store a user ID. By default it uses $USER as user ID for any query that needs a user ID. It can be used with other options to find the information for other users.
+.B -u, --user
+Store a user ID.
+By default it uses $USER as user ID for any query that needs a
+user ID.
+It can be used with other options to find the information for other
+users.
 .TP
-.B -v, --version 
-Show programs version number and exit.
+.B -v, --version
+Show program\[cq]s version number and exit.
 .TP
 .B --eff
-Show efficiency of a job. It requires a valid job ID as argument. It uses Slurm seff command for completed/finished jobs and Unix top command for a running job.
+Show efficiency of a job.
+It requires a valid job ID as argument.
+It uses Slurm seff command for completed/finished jobs and
+Unix top command for a running job.
 .TP
-.B --history 
-Return jobs history for last day, week, month or year. It requires one of the day/week/month/year options as an argument. It uses Slurm sacct command and return empty output if the cluster does not use Slurm for users account management.
+.B --history
+Return jobs history for last day, week, month or
+year.
+It requires one of the day/week/month/year options as an argument.
+It uses Slurm sacct command and returns empty output if the
+cluster does not use Slurm for users\[cq] account management.
 .TP
-.B --pending 
-Return users pending jobs by using Slurm squeue command.
+.B --pending
+Return user\[cq]s pending jobs by using Slurm
+squeue command.
 .TP
-.B --running 
-Return users running jobs by using Slurm squeue command.
+.B --running
+Return user\[cq]s running jobs by using Slurm
+squeue command.
 .TP
 .B --cancel
-Cancel jobs by a single ID or a comma separated list of IDs using Slurm scancel command.
+Cancel jobs by a single ID or a comma separated list
+of IDs using Slurm scancel command.
 .TP
-.B --qos 
-Show users quality of services (QOS) and a list of available QOS in the cluster. It uses Slurm sacctmgr show assoc command and return empty output if the cluster does not use Slurm for users account management.
+.B --qos
+Show user\[cq]s quality of services (QOS) and a list of
+available QOS in the cluster.
+It uses Slurm sacctmgr show assoc command and returns empty
+output if the cluster does not use Slurm for users\[cq] account
+management.
 .TP
-.B --quota 
-Return users disk quotas. It uses lfs quota command for LFS systems and Unix df command for NFS systems. It returns pooled size of the disk if the cluster does not have user/group storage accounts.
+.B --quota
+Return user\[cq]s disk quotas.
+It uses lfs quota command for LFS systems and Unix
+df command for NFS systems.
+It returns pooled size of the disk if the cluster does not have
+user/group storage accounts.
 .TP
-.B --ncpu 
-Show number of available cpus on the cluster using Slurm sinfo command.
+.B --ncpu
+Show number of available cpus on the cluster using
+Slurm sinfo command.
 .TP
-.B --ncgu 
-Show number of available gpus on the cluster using Slurm squeue and sinfo commands.
+.B --ncgu
+Show number of available gpus on the cluster using
+Slurm squeue and sinfo commands.
 .TP
-.B --gpu 
-Show gpu resources including gpu cards name and numbers using Slurm sinfo command.
+.B --gpu
+Show gpu resources including gpu cards\[cq] name and
+numbers using Slurm sinfo command.
 .TP
-.B --license 
-Show available license servers using Slurm scontrol command.
+.B --license
+Show available license servers using Slurm
+scontrol command.
 .TP
-.B --reserve 
-Show Slurm reservations using Slurm scontrol command.
+.B --reserve
+Show Slurm reservations using Slurm
+scontrol command.
 .TP
-.B --topusage 
-Show top usage users using Slurm sreport command.
+.B --topusage
+Show top usage users using Slurm sreport
+command.
 .TP
 .B --whodat
-Show users informations by UID. It uses ldapsearch command and returns empty output if the cluster does not use LDAP.
+Show users informations by UID.
+It uses ldapsearch command and returns empty output if the
+cluster does not use LDAP.
 .TP
 .B --whodat2
-Show users informations by name. It uses ldapsearch command and returns empty output if the cluster does not use LDAP.
+Show users informations by name.
+It uses ldapsearchcommand and returns empty output if the
+cluster does not use LDAP.
 .TP
-.B --agent 
-Start, stop and list users ssh-agents on the current host. It requires one of the start/stop/list options as an argument. Use ssh -o StrictHostKeyChecking=no to disable asking for host key acceptances.
+.B --agent
+Start, stop and list user\[cq]s ssh-agents on the
+current host.
+It requires one of the start/stop/list options as an argument.
+Use ssh -o StrictHostKeyChecking=no to disable asking for host
+key acceptances.
 .PP
-\f[B]Examples
+Examples
 .PP
-Jobs histoty
+Jobs histoty:
 .IP
 .nf
 [user\[at]lewis4-r630-login-node675 \[ti]]$ sbox --hist day
@@ -117,7 +162,17 @@ Jobs histoty
   23126131  user  genera+ CANCELLED+       Gpu  normal    1    1    2Gn 2021-07-28T01:27:43   00:00:01 2021-07-28T01:27:44   00:01:03 2021-07-28T01:28:47 lewis4-z10pg-gpu3-n+
 .fi
 .PP
-Jobs efficiency:
+Jobs efficiency for running and compeleted jobs:
+.IP
+.nf
+[user\[at]lewis4-r630-login-node675 \[ti]]$ sbox --eff 23227816
+------------------------------------- Job Efficiency -------------------------------------
+   PID USER      PR  NI    VIRT    RES     SHR  S   %CPU   %MEM   TIME+   COMMAND
+ 47262 user      20   0  115700   3888     1600 S   0.0    0.0    0:00.03 bash
+ 47346 user      20   0  113292   149298   1256 S   99.0   23.0   0:13.30 python
+RES: shows resident memory which is accurate representation of how much actual physical memory a process is consuming
+%CPU: shows the percentage of the CPU that is being used by the process
+.fi
 .IP
 .nf
 [user\[at]lewis4-r630-login-node675 \[ti]]$ sbox --eff 23126131
@@ -125,12 +180,12 @@ Jobs efficiency:
 Job ID: 23126131
 Cluster: lewis4
 User/Group: user/user
-State: CANCELLED (exit code 0)
+State: COMPLETED (exit code 0)
 Cores: 1
-CPU Utilized: 00:00:01
-CPU Efficiency: 1.59% of 00:01:03 core-walltime
-Memory Utilized: 45.80 MB
-Memory Efficiency: 2.24% of 2.00 GB
+CPU Utilized: 00:11:01
+CPU Efficiency: 48.59% of 00:21:03 core-walltime
+Memory Utilized: 445.80 MB
+Memory Efficiency: 24.24% of 2.00 GB
 .fi
 .PP
 Accounts, fairshares, and groups:
@@ -139,7 +194,6 @@ Accounts, fairshares, and groups:
 [user\[at]lewis4-r630-login-node675 \[ti]]$ sbox -afg
 ---------------------------------------- Accounts ----------------------------------------
 rcss-gpu  root  general-gpu  rcss  general
-
 --------------------------------------- Fairshare ----------------------------------------
              Account       User  RawShares  NormShares    RawUsage  EffectvUsage  FairShare 
 -------------------- ---------- ---------- ----------- ----------- ------------- ---------- 
@@ -148,7 +202,6 @@ general-gpu                user          1    0.000005        3942      0.000016
 rcss                       user          1    0.001391        1327      0.001147   0.564645 
 general                    user          1    0.000096     3196356      0.000243   0.174309 
 rcss-gpu                   user          1    0.000181           0      0.000000   0.999976 
-
 ----------------------------------------- Groups -----------------------------------------
 user : user rcss gaussian biocompute rcsslab-group rcss-maintenance rcss-cie software-cache
 .fi
@@ -175,6 +228,32 @@ Jobs in the queue:
              JOBID PARTITION     NAME     USER ST       TIME  NODES NODELIST(REASON)
           23150514     Lewis jupyter-    user   R       5:29      1 lewis4-r630-hpc4-node537
 .fi
+.PP
+Cluster resources:
+.IP
+.nf
+[user\[at]lewis4-r630-login-node675 \[ti]]$ sbox --ngpu
+------------------------------------- Number of GPUs -------------------------------------
+Partition Gpu has 19 gpus available out of 27 (70%)
+Partition gpu3 has 15 gpus available out of 15 (100%)
+Partition gpu4 has 4 gpus available out of 12 (33%)
+.fi
+.IP
+.nf
+[user\[at]lewis4-r630-login-node675 \[ti]]$ sbox --ncpu
+------------------------------------- Number of CPUs -------------------------------------
+Partition Interactive has 158 cpus available out of 160 (99%)
+Partition Lewis has 161 cpus available out of 2344 (7%)
+Partition Serial has 42 cpus available out of 48 (88%)
+Partition Dtn has 35 cpus available out of 36 (97%)
+Partition hpc3 has 24 cpus available out of 456 (5%)
+Partition hpc4 has 79 cpus available out of 1008 (8%)
+Partition hpc4rc has 58 cpus available out of 952 (6%)
+Partition hpc5 has 70 cpus available out of 1400 (5%)
+Partition hpc6 has 0 cpus available out of 2976 (0%)
+Partition General has 1837 cpus available out of 7008 (26%)
+Partition Gpu has 383 cpus available out of 412 (93%)
+.fi
 .SH AUTHOR
 Ashkan Mirzaee: https://ashki23.github.io/
 .SH INTERNET RESOURCES
@@ -184,7 +263,6 @@ Documentation:  https://sbox.readthedocs.io/
 Downloads:  https://github.com/ashki23/sbox/releases/latest
 .br
 Module repository:  https://github.com/ashki23/sbox
-
 .SH LICENSING
 Sbox is distributed under an Open Source license. See the file
 "LICENSE" in the source distribution for information on terms &

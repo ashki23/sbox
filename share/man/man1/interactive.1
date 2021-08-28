@@ -2,17 +2,25 @@
 .SH NAME
 interactive \- an alias for using cluster interactively
 .SH SYNOPSIS
-.B interactive
-[\fB-h\fR] [\fB-A\fR] [\fB-n\fR] [\fB-N\fR] [\fB-p\fR] [\fB-t\fR] [\fB-l\fR] [\fB-m\fR] [\fB-g\fR] [{jupyter}]
+interactive [-h] [-a] [-n] [-N] [-p] [-t] [-k] [-e] [-E] [-l] [-m] [-g] [{jupyter}]
 .br
 .SH DESCRIPTION
-Interactive command uses Slurm srun and sbatch commands to request resources interactively including running a Jupyter server on the cluster. Multiple kernels and environments can be applied to use different software and packages in JupyterLab.
+.PP
+interactive is an alias for using cluster interactively using
+Slurm srun and sbatch commands.
+The interactive jupyter provides a JupyterLab interface for
+using scientific software including Python, R, Julia, and their
+libraries.
+The command submits a batch file by sbatch command and runs a
+Jupyter server on the cluster.
+Multiple kernels and environments can be applied to use different
+software and packages in JupyterLab.
 .SH COMMAND LINE OPTIONS
 .TP
-.B -h, --help 
+.B -h, --help
 Show this help message and exit.
 .TP
-.B -A, --account 
+.B -a, --account
 Slurm account name or project ID.
 .TP
 .B -n, --ntasks
@@ -25,29 +33,32 @@ Number of nodes.
 Partition name.
 .TP
 .B -t, --time
-Number of hours based on the partitions time limits.
+Number of hours based on the partitions timelimit.
 .TP
 .B -l, --license
 Add a license to an interactive session.
 .TP
 .B -m, --mem
-Amount of memory per GB.
+Amount of memory (per GB).
 .TP
 .B -g, --gpu
 Number of gpus.
 .TP
 .B -k, --kernel
-Jupyter kernel for python, r, julia. The default kernel is python.
+Jupyter kernel for python, r, julia.
+The default kernel is python.
 .TP
 .B -e, --environment
-Virtual environment(s) for a JupyterLab session.
+Virtual environment(s) for a JupyterLab
+session.
 .TP
-.B -y, --myenv
-Path to a local virtual environment. The local virtual envs should contain JupyterLab.
+.B -E, --myenv
+Path to a local virtual environment.
+The local virtual envs should contain JupyterLab.
 .PP
-\f[B]Examples
+Examples
 .PP
-Use the cluster interactively:
+Using the cluster interactively:
 .IP
 .nf
 [user\[at]lewis4-r630-login-node675 \[ti]]$ interactive
@@ -55,7 +66,7 @@ Logging into Interactive partition with 2G memory, 1 cpu for 2 hours ...
 [user\[at]lewis4-r7425-htc5-node835 \[ti]]$ 
 .fi
 .PP
-Use the cluster interactively with more time and resources:
+Using the cluster interactively with more time and resources:
 .IP
 .nf
 [user\[at]lewis4-r630-login-node675 \[ti]]$ interactive --mem 16 -n 6 -t 4
@@ -63,7 +74,7 @@ Logging into Interactive partition with 16G memory, 6 cpu for 4 hours ...
 [user\[at]lewis4-r7425-htc5-node835 \[ti]]$
 .fi
 .PP
-Use the cluster interactively with a license:
+Using the cluster interactively with a license:
 .IP
 .nf
 [user\[at]lewis4-r630-login-node675 \[ti]]$ interactive --mem 16 -n 6 -t 4 -l matlab
@@ -71,7 +82,7 @@ Logging into Interactive partition with 16G memory, 6 cpu for 4 hours with a mat
 [user\[at]lewis4-r7425-htc5-node835 \[ti]]$
 .fi
 .PP
-Use a Gpu interactively:
+Using a Gpu interactively:
 .IP
 .nf
 [user\[at]lewis4-r630-login-node675 \[ti]]$ interactive -p Gpu
@@ -79,7 +90,7 @@ Logging into Gpu partition with 1 gpu, 2G memory, 1 cpu for 2 hours ...
 [user\[at]lewis4-r730-gpu3-node431 \[ti]]$
 .fi
 .PP
-Use JupyterLab:
+Using JupyterLab:
 .IP
 .nf
 [user\[at]lewis4-r630-login-node675 \[ti]]$ interactive jupyter
@@ -87,23 +98,31 @@ Logging into Lewis partition with 2G memory, 1 cpu for 2 hours ...
 Starting Jupyter server (it might take about a couple minutes) ...
 Starting Jupyter server ...
 Starting Jupyter server ...
-
 Jupyter Notebook is running.
-
 Open a new terminal in your local computer and run:
 ssh -NL 8888:lewis4-r630-hpc4-node303:8888 user\[at]lewis.rnet.missouri.edu
-
 After that open a browser and go:
 http://127.0.0.1:8888/?token=9e223bd179d228e0e334f8f4a85dfd904eebd0ab9ded7e55
-
 To stop the server run the following on the cluster:
 scancel 23150533
 .fi
 .PP
-Use TensorFlow with JupyterLab:
+Using JupyterLab with R kernel:
 .IP
 .nf
-[user\[at]lewis4-r630-login-node675 \[ti]]$ interactive jupyter -A general-gpu -p gpu3 --mem 16 -t 8 -e tensorflow
+[user\[at]lewis4-r630-login-node675 \[ti]]$ interactive jupyter -k r
+Logging into Lewis partition with 2G memory, 1 cpu for 2 hours ...
+Starting Jupyter server (it might take about a couple minutes) ...
+Starting Jupyter server ...
+Starting Jupyter server ...
+\&...
+.fi
+.PP
+Using TensorFlow on JupyterLab by a different account and on a partition
+with 16 GB memory for 8 hours:
+.IP
+.nf
+[user\[at]lewis4-r630-login-node675 \[ti]]$ interactive jupyter -a general-gpu -p gpu3 --mem 16 -t 8 -e tensorflow
 Logging into gpu3 partition with 1 gpu, 16G memory, 1 cpu for 8 hours with account general-gpu ...
 Starting Jupyter server (it might take about a couple minutes) ...
 Starting Jupyter server ...
@@ -111,15 +130,39 @@ Starting Jupyter server ...
 \&...
 .fi
 .PP
-Use R with JupyterLab:
+Note: Users can install other packages and mix local packages
+with the premade environments.
+For example, for Python:
 .IP
 .nf
-interactive jupyter -k r
+pip install --target </path/my-packages/lib/> <pkg-name>
+export PYTHONPATH=</path/my-packages/lib/>:$PYTHONPATH
+.fi
+.PP
+For R, run the following in R:
+.IP
+.nf
+dir.create(\[dq]<your/path/for/R/version>\[dq])
+install.packages(\[dq]<pkg-name>\[dq], repos = \[dq]http://cran.us.r-project.org\[dq], lib = \[dq]<your/path/for/R/version>\[dq])
+\&.libPaths(\[dq]<your/path/for/R/version>\[dq])
+.fi
+.PP
+Using a local virtual environment:
+.IP
+.nf
+[user\[at]lewis4-r630-login-node675 \[ti]]$ interactive jupyter -E </path/to/local/env>
 Logging into Lewis partition with 2G memory, 1 cpu for 2 hours ...
 Starting Jupyter server (it might take about a couple minutes) ...
 Starting Jupyter server ...
-Starting Jupyter server ...
-\&...
+.fi
+.PP
+Note: The local environments must include
+jupyterlab.
+For R environments, they must also contain r-irkernel.
+For instance:
+.IP
+.nf
+conda create -p </path/to/local/env> -c conda-forge r-base jupyterlab r-irkernel
 .fi
 .SH AUTHOR
 Ashkan Mirzaee: https://ashki23.github.io/
@@ -130,7 +173,6 @@ Documentation:  https://sbox.readthedocs.io/
 Downloads:  https://github.com/ashki23/sbox/releases/latest
 .br
 Module repository:  https://github.com/ashki23/sbox
-
 .SH LICENSING
 Sbox is distributed under an Open Source license. See the file
 "LICENSE" in the source distribution for information on terms &

@@ -1,29 +1,35 @@
 Quick install
-=============
+-------------
 
--  Download and extract the `latest Sbox release <https://github.com/ashki23/sbox/releases/latest>`__.
+-  Download and extract the `latest Sbox
+   release <https://github.com/ashki23/sbox/releases/latest>`__.
+-  To access JupyerLab sessions, install Anaconda and create required
+   virtual environments and modulefiles. Review “Requirements” to learn
+   more.
 -  Update the ``config`` file based on the cluster information. Review
-   `Configuration <https://sbox.readthedocs.io/en/latest/requirements.html#configuration>`__ to learn more.
--  To access a JupyerLab session, install Anaconda and create the required virtual environments and modulefiles. Review
-   `Requirements <https://sbox.readthedocs.io/en/latest/requirements.html#requirements>`__ to learn more.
--  Place a modulefile for Sbox under ``$MODULEPATH/sbox`` and load the module or add the Sbox bin directory to ``$PATH``. A Sbox template modulefile can be found in `here <https://github.com/ashki23/sbox/blob/main/templates/1.2.lua>`__.
+   “Configuration” to learn more.
+-  Place a modulefile for Sbox under ``$MODULEPATH/sbox`` directory and
+   load the module or add the Sbox bin directory to ``$PATH``. A Sbox
+   template modulefile can be found in
+   `here <https://github.com/ashki23/sbox/blob/main/templates/1.2.lua>`__.
 
 Requirements
-============
+------------
 
 Sbox requires Slurm and Python >= 3.6.8. The ``interactive jupyter``
 command requires Anaconda and an environment module system
 (e.g. `Lmod <https://lmod.readthedocs.io/en/latest/>`__) in addition to
-Slurm and Python. To use R and Julia in JupyterLab sessions, we need R and irkernel as well as Julia to be installed.
+Slurm and Python. To use R and Julia in JupyterLab sessions, we need R
+and irkernel as well as Julia to be installed.
 
-Note that Sbox options require some other commands. Review
-the options requirement under the `command line options <https://sbox.readthedocs.io/en/latest/sbox.html#command-line-options>`__.
+Note that Sbox options require some other commands. Review their
+requirements under the command line options.
 
 The following shows how to install Anaconda and create the required
 virtual envs and modulefiles.
 
 Python kernel (Anaconda)
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 The ``interactive jupyter`` command provides a JupyterLab interface for
 running Python and many scientific packages by using Anaconda. To
@@ -68,7 +74,7 @@ modeulefile under ``$MODULEPATH/anaconda/<year.month>.lua``:
 Or adding the following tcl modulefile under
 ``$MODULEPATH/anaconda/<year.month>``:
 
-.. code::
+.. code:: tcl
 
    #%Module1.0
    ## Metadata ###########################################
@@ -100,7 +106,7 @@ Or adding the following tcl modulefile under
    setenv        ${this_module_upper}_ROOT  ${this_root}
 
 R kernel
---------
+~~~~~~~~
 
 Users can run R scripts within a JupterLab notebook by
 ``interactive jupyter -k r``. To have R, irkernel and many other R
@@ -114,8 +120,8 @@ from Anaconda:
    ./bin/conda create -n r-essentials-<R version> -c conda-forge r-essentials r-base r-irkernel jupyterlab
 
 In the above lines, ``<cluster software path>`` and ``<year.month>``
-should be updated based on the Anaconda path and ``<R version>``
-(e.g. ``4.0.3``) based on the version of R in the env.
+should be updated based on the Anaconda path and version, and
+``<R version>`` (e.g. ``4.0.3``) based on the version of R in the env.
 
 The following modulefile should be added to
 ``$MODULEPATH/r-essentials/<R version>.lua`` to be able to load the R
@@ -142,20 +148,21 @@ env:
    prepend_path("C_INCLUDE_PATH", this_root .. "/include", ":")
    prepend_path("CPLUS_INCLUDE_PATH", this_root .. "/include", ":")
    prepend_path("PKG_CONFIG_PATH", this_root .. "/lib/pkgconfig", ":")
-   setenv("RESSENTIALS_ROOT", this_root)
+   setenv("ANACONDA_ROOT", this_root)
 
-Or adding a tcl modulefile similar to the above tcl template for Anaconda.
+Or adding a tcl modulefile similar to the above tcl template for
+Anaconda.
 
 Julia kernel
-------------
+~~~~~~~~~~~~
 
 The ``interactive jupyter -k julia`` command provides Julia from a
 JupyterLab notebook. Julia can be installed from
 `Spack <https://spack.io/>`__,
 `source <https://julialang.org/downloads/>`__ or
 `Anaconda <https://anaconda.org/conda-forge/julia>`__. The following
-shows how to install Julia from Anaconda (Note that if Julia have
-been installed on the cluster, you can skip this section and use the
+shows how to install Julia from Anaconda (Note that if Julia have been
+installed on the cluster, you can skip this section and use the
 available Julia module instead).
 
 .. code:: bash
@@ -164,8 +171,8 @@ available Julia module instead).
    ./bin/conda create -n julia-<version> -c conda-forge julia
 
 In the above lines, ``<cluster software path>`` and ``<year.month>``
-should be updated based on the Anaconda path and ``<version>``
-(e.g. ``1.6.1``) based on the version of Julia in the env.
+should be updated based on the Anaconda path and version, and
+``<version>`` (e.g. ``1.6.1``) based on the version of Julia in the env.
 
 The following modulefile should be added to
 ``$MODULEPATH/julia/<version>.lua``:
@@ -191,15 +198,17 @@ The following modulefile should be added to
    prepend_path("C_INCLUDE_PATH", this_root .. "/include", ":")
    prepend_path("CPLUS_INCLUDE_PATH", this_root .. "/include", ":")
    prepend_path("PKG_CONFIG_PATH", this_root .. "/lib/pkgconfig", ":")
-   setenv("JULIA_ROOT", this_root)
+   setenv("ANACONDA_ROOT", this_root)
 
-Or adding a tcl modulefile similar to the above tcl template for Anaconda.
+Or adding a tcl modulefile similar to the above tcl template for
+Anaconda.
 
-Note that the first time that users run ``interactive jupyter -k julia``,
-Julia Jupyter kernal (IJulia) will be installed under ``~/.julia``.
+Note that the first time that users run
+``interactive jupyter -k julia``, Julia Jupyter kernal (IJulia) will be
+installed under ``~/.julia``.
 
 On demand Python and R pakages
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Popular Python pakages that are not available in Anaconda can be added
 to ``interactive jupyter -e``. For instance the following shows how to
@@ -215,11 +224,12 @@ Similarly, we can create a PyTorch (PT) env with:
 
 .. code:: bash
 
-   cd /<cluster software path>/anaconda/<year.month>
+   cd /<cluster software path>/anaconda/<year.month> 
    ./bin/conda create -n pytorch-<version> anaconda
    ./bin/conda install -n pytorch-<version> -c pytorch pytorch gpustat
 
-For instance, we can collect set of popular R bio packages in the following env from bioconda channel:
+For instance, we can collect popular R bio packages in the following env
+from bioconda channel:
 
 .. code:: bash
 
@@ -227,8 +237,8 @@ For instance, we can collect set of popular R bio packages in the following env 
    ./bin/conda create -n r-bioessentials-<version> -c bioconda -c conda-forge bioconductor-edger bioconductor-oligo r-monocle3 r-signac r-seurat scanpy macs2 jupyterlab r-irkernel
 
 In the above lines, ``<cluster software path>`` and ``<year.month>``
-should be updated based on the Anaconda path and ``<version>``
-(e.g. ``2.4.1``) based on the version of TF, PT, and R.
+should be updated based on the Anaconda path and version, and
+``<version>`` (e.g. ``2.4.1``) based on the version of TF, PT, or R.
 
 For each env, we need to add a modulefile to
 ``$MODULEPATH/<env name>/<version>.lua``. For instance
@@ -255,12 +265,21 @@ For each env, we need to add a modulefile to
    prepend_path("C_INCLUDE_PATH", this_root .. "/include", ":")
    prepend_path("CPLUS_INCLUDE_PATH", this_root .. "/include", ":")
    prepend_path("PKG_CONFIG_PATH", this_root .. "/lib/pkgconfig", ":")
-   setenv("TENSORFLOW_ROOT", this_root)
+   setenv("ANACONDA_ROOT", this_root)
 
-Or adding a tcl modulefile similar to the above tcl template for Anaconda.
+Or adding a tcl modulefile similar to the above tcl template for
+Anaconda.
+
+**Note**: Users can add other packages and mix a local stack of packages
+with the premade environments. For Python and R packages users can apply
+``pip install`` and ``install.packages`` respectively to install
+packages on their home. In order to install packages in a differnt path
+than home, we can specify the desired path and add the new path to the
+library path of the software. See examples under the ``interactive``
+command line options examples.
 
 Configuration
-=============
+-------------
 
 The ``sbox`` and ``interactive`` commands are reading the required
 information from the below JSON config file.
@@ -281,21 +300,25 @@ information from the below JSON config file.
 
 The config file includes:
 
--  ``disk_quota_paths``: A list of paths to the disks for finding users
-   quotas. By default the first input is considered as the users’ home path.
+-  ``disk_quota_paths``: A list of paths to the disk for finding users
+   quotas. By default the first input is considered as the users’ home
+   path.
 -  ``cpu_partition``: A list of computational partitions.
 -  ``gpu_partition``: A list of GPU partitions.
 -  ``interactive_partition_timelimit``: A dictionary of interactive
    partitions (i.e. users should access by ``srun``) and their time
-   limits (hour). The first input is considered as the default partition.
+   limits (hour). The first input is considered as the default
+   partition.
 -  ``jupyter_partition_timelimit``: A dictionary of computational/gpu
    partitions that users can run Jupter servers interactively and their
-   time limits (hour). The first input is considered as the default partition.
+   time limits (hour). The first input is considered as the default
+   partition.
 -  ``partition_qos``: A dictionary of partitions and the corresponding
    quality of services.
--  ``kernel_module``: A dictionary of kernels and the corresponding modules.
-   A Python kernel is required (review `here <https://sbox.readthedocs.io/en/latest/requirements.html#python-kernel-anaconda>`__).
--  ``env_module``: A dictionary of virtual environments and the corresponding modules.
+-  ``kernel_module``: A dictionary of kernels and the corresponding
+   modules. A Python kernel is required (review the Requirments).
+-  ``env_module``: A dictionary of virtual environments and the
+   corresponding modules.
 
 For example:
 
@@ -306,23 +329,23 @@ For example:
        "cpu_partition": ["Interactive","Lewis","Serial","Dtn","hpc3","hpc4","hpc4rc","hpc5","hpc6","General","Gpu"],
        "gpu_partition": ["Gpu","gpu3","gpu4"],
        "interactive_partition_timelimit": {
-       "Interactive": 4,
-       "Dtn": 4,
-       "Gpu": 2
+           "Interactive": 4,
+           "Dtn": 4,
+           "Gpu": 2
        },
        "jupyter_partition_timelimit": {
-	  "Lewis": 8,
-	  "hpc4": 8,
-	  "hpc5": 8,
-	  "hpc6": 8,
-	  "gpu3": 8,
-	  "gpu4": 8,
-	  "Gpu": 2
+           "Lewis": 8,
+           "hpc4": 8,
+           "hpc5": 8,
+           "hpc6": 8,
+           "gpu3": 8,
+           "gpu4": 8,
+           "Gpu": 2
        },
        "partition_qos": {
-	  "Interactive": "interactive",
-	  "Serial": "seriallong",
-	  "Dtn": "dtn"
+           "Interactive": "interactive",
+           "Serial": "seriallong",
+           "Dtn": "dtn"
        },
        "kernel_module": {
            "python": "anaconda",
@@ -330,9 +353,9 @@ For example:
            "julia": "julia"
        },
        "env_module": {
-	  "tensorflow-v1.9": "tensorflow/1.9.0",
-	  "tensorflow": "tensorflow",
-	  "pytorch": "pytorch",
-	  "r-bio": "r-bioessentials"
+           "tensorflow-v1.9": "tensorflow/1.9.0",
+           "tensorflow": "tensorflow",
+           "pytorch": "pytorch",
+           "r-bio": "r-bioessentials"
        }
    }
