@@ -4,3 +4,16 @@
 {{ super() }}
 <meta name="google-site-verification" content="FDP5MGoPP8tN2S79oM77c6nL326KHxVNTwl-GM6l3SY" />
 {% endblock %}
+
+{% block footer %}
+{{ super() }}
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M70M4SV92Z"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-M70M4SV92Z');
+</script>
+{% endblock %}
