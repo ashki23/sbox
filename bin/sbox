@@ -328,7 +328,7 @@ if args.agent:
         os.system(f"""
         if [ -z `which ssh-agent 2> /dev/null` ]; then echo "No ssh-agent found!"; exit; fi
         if [ -f ~/.ssh/id_rsa ]; then
-        if ! ps -elf | grep ssh-agent | grep -v grep | grep -q {user}; then
+        if ! ps -eo s,uid,pid,ppid,user:30,stime,cmd | grep ssh-agent | grep -v grep | grep -q {user}; then
         echo "Starting an agent on $(hostname) ..."
         install -d ~/.ssh_auth
         eval `ssh-agent -s`
@@ -357,9 +357,9 @@ fi
 
     if args.agent == 'stop':
         os.system(f"""
-        if ps -elf | grep ssh-agent | grep -v grep | grep -q {user}; then
+        if ps -eo s,uid,pid,ppid,user:30,stime,cmd | grep ssh-agent | grep -v grep | grep -q {user}; then
         echo "Stopping the current agent on $(hostname) ..."
-        kill `ps -elf | grep ssh-agent | grep -v grep | grep {user} | awk '{{print $4}}'`
+        kill `ps -eo s,uid,pid,ppid,user:30,stime,cmd | grep ssh-agent | grep -v grep | grep {user} | awk '{{print $3}}'`
         rm ~/.ssh_auth/$(hostname) 2> /dev/null
         else
         echo "No running agent found on $(hostname)."
@@ -368,8 +368,8 @@ fi
 
     if args.agent == 'list':
         os.system(f"""
-        if ps -elf | grep ssh-agent | grep -v grep | grep -q {user}; then
-        ps -elf | grep ssh-agent | grep -v grep | grep {user}
+        if ps -eo s,uid,pid,ppid,user:30,stime,cmd | grep ssh-agent | grep -v grep | grep -q {user}; then
+        ps -eo s,uid,pid,ppid,user:30,stime,cmd | grep -P "ssh-agent|USER" | grep -v grep | grep -P "{user}|USER"
         else
         echo "No running agent found on $(hostname)."
         fi
