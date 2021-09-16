@@ -1,8 +1,8 @@
-.TH SBOX "1" "August 2021" "SBOX 1.2"
+.TH SBOX "1" "September 2021" "SBOX 1.2"
 .SH NAME
 sbox \- a simple toolbox for Slurm
 .SH SYNOPSIS
-sbox [-h] [-a] [-f] [-g] [-q] [-j JOBID] [-c] [-p] [-u UID] [-v] [--eff JOBID] [--history {day,week,month,year}] [--pending] [--running] [--cancel JOBID] [--qos] [--quota] [--ncpu] [--ngpu] [--gpu] [--license] [--reserve] [--topusage] [--whodat UID] [--whodat2 UNAME] [--agent {start,stop,list}]
+sbox [-h] [-a] [-f] [-g] [-q] [-j JOBID] [-c] [-p] [-u UID] [-v] [--eff JOBID] [--history {day,week,month,year}] [--pending] [--running] [--cancel JOBID] [--qos] [--quota] [--ncpu] [--ngpu] [--gpu] [--license] [--reserve] [--topusage] [--whodat UID] [--whodat2 UNAME] [--agent {start,stop,list}] [--report]
 .br
 .SH DESCRIPTION
 .PP
@@ -143,6 +143,10 @@ current host.
 It requires one of the start/stop/list options as an argument.
 Use ssh -o StrictHostKeyChecking=no to disable asking for host
 key acceptances.
+.TP
+.B --report
+Show the cluster utilization report.
+It uses sinfo and squeue commands.
 .PP
 Examples
 .PP

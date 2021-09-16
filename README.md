@@ -53,6 +53,7 @@ Sbox is a toolbox for Slurm that provides information about users' accounts and 
 - `--whodat`: Show users informations by UID. It uses `ldapsearch` command and returns empty output if the cluster does not use LDAP.
 - `--whodat2`: Show users informations by name. It uses `ldapsearch`command and returns empty output if the cluster does not use LDAP.
 - `--agent`: Start, stop and list user's ssh-agents on the current host. It requires one of the start/stop/list options as an argument. Use `ssh -o StrictHostKeyChecking=no` to disable asking for host key acceptances.
+- `--report`: Show the cluster utilization report. It uses `sinfo` and `squeue` commands.
 
 **Examples**
 

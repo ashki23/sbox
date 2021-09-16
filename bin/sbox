@@ -23,6 +23,7 @@ except Exception as err:
 
 part_cpu = config['cpu_partition']
 part_gpu = config['gpu_partition']
+part_all = part_cpu + part_gpu
 
 try:
     user = os.getenv('USER').strip()
@@ -58,6 +59,7 @@ parser.add_argument('--topusage', action = 'store_true', help = 'show top usage 
 parser.add_argument('--whodat', help = 'show users informations by uid', metavar = 'UID')
 parser.add_argument('--whodat2', help = 'show users informations by name', metavar = 'UNAME')
 parser.add_argument('--agent', choices = ['start','stop','list'], help = 'start/stop/list ssh-agents on the current host')
+parser.add_argument('--report', action = 'store_true', help = 'show the cluster utilization report')
 args = parser.parse_args()
 
 if len(sys.argv) == 1:
@@ -203,7 +205,7 @@ if args.ngpu:
     print(' Number of GPUs '.center(90,'-'))
     for g in part_gpu:
         unavail = os.popen(f"""
-        squeue -O jobid,partition,gres,state,username | grep RUNNING | grep -i {g} | awk '{{ print $3 }}' | awk 'BEGIN{{ FS=":" }} {{ total+=$2 }} END{{ print total }}'
+        squeue -O jobid,partition,gres,state,username | grep RUNNING | grep -i {g} | awk '{{ print $3 }}' | awk 'BEGIN {{ FS=":" }} {{ total += $2 }} END {{ print total }}'
         """).read().strip()
         try:
             unavail = int(unavail)
@@ -373,4 +375,20 @@ fi
         else
         echo "No running agent found on $(hostname)."
         fi
+        """)
+
+if args.report:
+    if len(part_all) == 0:
+        print('No CPU/GPU partition found in the config file!')
+        sys.exit(1)
+    
+    print('date,partition,type,total,allocation,utilization')
+    for c in part_cpu:
+        os.system(f"""
+        (date +"%F"| tr "\n" " " ; echo "{c} cpu" | tr "\n" " " ; sinfo --partition {c} --Node --format %C | cut --delimiter '/' --fields 1,4 | tr '/' ' ' | awk '{{ sum1 += $1; sum2 += $2 }} END {{ print sum2, sum1, sum1/sum2 }}') | tr " " ","
+        """)
+    for g in part_gpu:
+        os.system(f"""
+        gpu_util=`(date +"%F"| tr "\n" " " ; echo "{g} gpu" | tr "\n" " " ; sinfo -p {g} -o %n,%G | grep -Po '(?<=:)\d' | awk '{{ sum1 += $1 }} END {{ print sum1 }}' | tr "\n" " " ; squeue -O jobid,partition,gres,state,username | grep RUNNING | grep -i {g} | awk '{{ print $3 }}' | awk 'BEGIN{{ FS=":" }} {{ total+=$2 }} END{{ print total }}')`
+        (echo $gpu_util | tr "\n" " " ; echo $gpu_util | awk '{{ print $5/$4 }}') | tr " " ","
         """)

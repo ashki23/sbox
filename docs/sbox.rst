@@ -76,6 +76,8 @@ Command line options
    host. It requires one of the start/stop/list options as an argument.
    Use ``ssh -o StrictHostKeyChecking=no`` to disable asking for host
    key acceptances.
+-  ``--report``: Show the cluster utilization report. It uses ``sinfo``
+   and ``squeue`` commands.
 
 **Examples**
 
