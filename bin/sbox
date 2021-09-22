@@ -389,6 +389,6 @@ if args.report:
         """)
     for g in part_gpu:
         os.system(f"""
-        gpu_util=`(date +"%F"| tr "\n" " " ; echo "{g} gpu" | tr "\n" " " ; sinfo -p {g} -o %n,%G | grep -Po '(?<=:)\d' | awk '{{ sum1 += $1 }} END {{ print sum1 }}' | tr "\n" " " ; squeue -O jobid,partition,gres,state,username | grep RUNNING | grep -i {g} | awk '{{ print $3 }}' | awk 'BEGIN{{ FS=":" }} {{ total+=$2 }} END{{ print total }}')`
-        (echo $gpu_util | tr "\n" " " ; echo $gpu_util | awk '{{ print $5/$4 }}') | tr " " ","
+        gpu_util=`(date +"%F"| tr "\n" " " ; echo "{g} gpu" | tr "\n" " " ; sinfo -p {g} -o %n,%G | grep -Po '(?<=:)\d' | awk '{{ sum1 += $1 }} END {{ print sum1 }}' | tr "\n" " " ; squeue -O jobid,partition,gres,state,username | grep RUNNING | grep -i {g} | awk '{{ print $3 }}' | awk 'BEGIN {{ FS=":" }} {{ total+=$2 }} END {{ print total }}')`
+        (echo $gpu_util | tr "\n" " " ; if [ -z `echo $gpu_util | awk '{{ print $5 }}'` ]; then echo "0 0"; else echo `echo $gpu_util | awk '{{ print $5/$4 }}'`; fi) | tr " " ","
         """)
