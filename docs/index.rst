@@ -5,6 +5,10 @@ Sbox is a toolbox for Slurm that provides information about users' accounts and 
 
 .. note:: You can download the latest release of Sbox from `https://github.com/ashki23/sbox/releases/latest <https://github.com/ashki23/sbox/releases/latest>`_ and find the source codes or fork the repository on `https://github.com/ashki23/sbox <https://github.com/ashki23/sbox>`__.
 
+.. image:: _static/SBox_application_SC21.png
+   :width: 500
+   :target: _static/SBox_application_SC21.pdf
+
 Features
 --------
 
@@ -20,18 +24,14 @@ Features
 * Managing users ssh-agent to be able to communicate with clients outside (e.g. GitHub) or within the cluster (other nodes) without asking for the passphrase.
 * Helping users by showing their fairshares, accounts, quotas, jobs' history, running and pending jobs, as well as cluster resources.
 
-Install
--------
+.. toctree::
+   :caption: Install
+   :maxdepth: 2
+   
+   requirements
 
 .. toctree::
-    :maxdepth: 2
-    
-    requirements
-
-Commands
---------
-
-.. toctree::
-    :maxdepth: 1
-
-    sbox
+   :caption: Commands
+   :maxdepth: 1
+   
+   sbox

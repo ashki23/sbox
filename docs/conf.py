@@ -28,15 +28,6 @@ html_sidebars = {
            #'localtoc.html'
     ],
 }
-html_theme_options = {
-    #'logo': 'logo.png',
-    'github_user': 'ashki23',
-    'github_repo': 'sbox',
-    'fixed_sidebar': True,
-    'github_button': True,
-    'page_width': '65%',
-    'description': "Sbox is a toolbox for Slurm that provides information about users activities and facilitate access to the cluster resources.",
-}
 
 # The full version, including alpha/beta/rc tags
 release = 'v1.2'
@@ -63,8 +54,27 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'alabaster'
-#html_theme = "sphinx_rtd_theme"
+#html_theme = 'alabaster'
+html_theme = "sphinx_rtd_theme"
+
+## For sphinx_rtd_theme
+html_theme_options = {
+    'logo_only': True,
+    'navigation_depth': 3,
+}
+html_logo = "_static/logo.svg"
+html_show_sourcelink = True
+
+## For alabaster theme 
+#html_theme_options = {
+    #'logo': 'logo.png',
+    #'github_user': 'ashki23',
+    #'github_repo': 'sbox',
+    #'fixed_sidebar': True,
+    #'github_button': True,
+    #'page_width': '65%',
+    #'description': "Sbox is a toolbox for Slurm that provides information about users activities and facilitate access to the cluster resources.",
+#}
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

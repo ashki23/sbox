@@ -1,8 +1,13 @@
 #!/bin/bash
 
+## Run the file from _static directory (cd _static)
+
 ## Create an env for Sphinx and Pandoc
 #conda create -n sphinx -c conda-forge sphinx pandoc 
-source activate sphinx
+conda activate sphinx
+
+## Build the local html for preview at ../_build/html/
+make -C ../ html
 
 ## RST Docs
 awk "/## Sbox/,/## Quick install/" ../../README.md | head -n -1 > sbox.md
