@@ -9,8 +9,8 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="1000mm"
-   height="240mm"
-   viewBox="0 0 1000 240"
+   height="190mm"
+   viewBox="0 0 1000 190"
    version="1.1"
    id="svg8"
    sodipodi:docname="logo.svg"
@@ -68,7 +68,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -80,28 +80,17 @@
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:169.333px;line-height:1.25;font-family:Purisa;-inkscape-font-specification:Purisa;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke-width:0.264583"
        x="264.67068"
-       y="147.48293"
+       y="166.00351"
        id="text12"><tspan
          sodipodi:role="line"
          id="tspan10"
          x="264.67068"
-         y="147.48293"
+         y="166.00351"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:169.333px;font-family:Purisa;-inkscape-font-specification:Purisa;fill:#ffffff;fill-opacity:1;stroke-width:0.264583">Sbox</tspan><tspan
          sodipodi:role="line"
          x="264.67068"
-         y="359.14917"
+         y="377.66977"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:50.8px;font-family:Purisa;-inkscape-font-specification:Purisa;fill:#ffffff;fill-opacity:1;stroke-width:0.264583"
          id="tspan865" /></text>
-    <text
-       xml:space="preserve"
-       style="font-size:50.8px;line-height:1.25;font-family:'DejaVu Sans';-inkscape-font-specification:'DejaVu Sans';letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke-width:0.264583"
-       x="96.545601"
-       y="228.09584"
-       id="text869"><tspan
-         sodipodi:role="line"
-         id="tspan867"
-         x="96.545601"
-         y="228.09584"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:50.8px;font-family:Purisa;-inkscape-font-specification:Purisa;fill:#ffffff;fill-opacity:1;stroke-width:0.264583">simple way to use clusters!</tspan></text>
   </g>
 </svg>
