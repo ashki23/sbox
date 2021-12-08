@@ -4,10 +4,10 @@
 
 ## Create an env for Sphinx and Pandoc
 #conda create -n sphinx -c conda-forge sphinx pandoc 
-conda activate sphinx
+source activate sphinx
 
 ## Build the local html for preview at ../_build/html/
-make -C ../ html
+#make -C ../ html
 
 ## RST Docs
 awk "/## Sbox/,/## Quick install/" ../../README.md | head -n -1 > sbox.md

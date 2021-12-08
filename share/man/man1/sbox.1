@@ -1,8 +1,8 @@
-.TH SBOX "1" "November 2021" "SBOX 1.2"
+.TH SBOX "1" "December 2021" "SBOX 1.2"
 .SH NAME
 sbox \- a simple toolbox for Slurm
 .SH SYNOPSIS
-sbox [-h] [-a] [-f] [-g] [-q] [-j JOBID] [-c] [-p] [-u UID] [-v] [--eff JOBID] [--history {day,week,month,year}] [--pending] [--running] [--cancel JOBID] [--qos] [--quota] [--ncpu] [--ngpu] [--gpu] [--license] [--reserve] [--topusage] [--whodat UID] [--whodat2 UNAME] [--agent {start,stop,list}] [--report]
+sbox [-h] [-a] [-f] [-g] [-q] [-j JOBID] [-c] [-p] [-u UID] [-v] [--eff JOBID] [--history {day,week,month,year}] [--pending] [--running] [--cancel JOBID] [--qos] [--quota] [--ncpu] [--ngpu] [--gpu] [--license] [--reserve] [--topusage] [--whodat UID] [--whodat2 UNAME] [--agent {start,stop,list}] [--report] [--report2]
 .br
 .SH DESCRIPTION
 .PP
@@ -145,8 +145,14 @@ Use ssh -o StrictHostKeyChecking=no to disable asking for host
 key acceptances.
 .TP
 .B --report
-Show the cluster utilization report.
-It uses sinfo and squeue commands.
+Show current cluster utilization based on the
+running jobs.
+It uses slurm sinfo and squeue commands.
+.TP
+.B --report2
+Show cluster utilization based on ended jobs in
+last day.
+It uses Slurm sacct command.
 .PP
 Examples
 .PP
