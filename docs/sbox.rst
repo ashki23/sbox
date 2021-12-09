@@ -77,9 +77,7 @@ Command line options
    Use ``ssh -o StrictHostKeyChecking=no`` to disable asking for host
    key acceptances.
 -  ``--report``: Show current cluster utilization based on the running
-   jobs. It uses slurm ``sinfo`` and ``squeue`` commands.
--  ``--report2``: Show cluster utilization based on ended jobs in last
-   day. It uses Slurm ``sacct`` command.
+   jobs. It uses Slurm ``sinfo`` and ``squeue`` commands.
 
 **Examples**
 

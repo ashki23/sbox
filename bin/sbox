@@ -61,7 +61,6 @@ parser.add_argument('--whodat', help = 'show users informations by uid', metavar
 parser.add_argument('--whodat2', help = 'show users informations by name', metavar = 'UNAME')
 parser.add_argument('--agent', choices = ['start','stop','list'], help = 'start/stop/list ssh-agents on a host')
 parser.add_argument('--report', action = 'store_true', help = 'show current cluster utilization')
-parser.add_argument('--report2', action = 'store_true', help = 'show cluster utilization in last 24 hours')
 args = parser.parse_args()
 
 if len(sys.argv) == 1:
@@ -383,35 +382,16 @@ if args.report:
     if len(part_all) == 0:
         print('No CPU/GPU partition found in the config file!')
         sys.exit(1)
-    
+
     print('date,partition,type,total,allocation,utilization')
     for c in part_cpu:
-        os.system(f"""
-        (date +"%F"| tr "\n" " " ; echo "{c} cpu" | tr "\n" " " ; sinfo --partition {c} --Node --format %C | cut --delimiter '/' --fields 1,4 | tr '/' ' ' | awk '{{ sum1 += $1; sum2 += $2 }} END {{ print sum2, sum1, sum1/sum2 }}') | tr " " ","
-        """)
-    for g in part_gpu:
-        os.system(f"""
-        gpu_util=`(date +"%F"| tr "\n" " " ; echo "{g} gpu" | tr "\n" " " ; sinfo -p {g} -o %n,%G | grep -Po '(?<=:)\d' | awk '{{ sum1 += $1 }} END {{ print sum1 }}' | tr "\n" " " ; squeue -O jobid,partition,gres,state,username | grep RUNNING | grep -i {g} | awk '{{ print $3 }}' | awk 'BEGIN {{ FS=":" }} {{ total+=$2 }} END {{ print total }}')`
-        (echo $gpu_util | tr "\n" " " ; if [ -z `echo $gpu_util | awk '{{ print $5 }}'` ]; then echo "0 0"; else echo `echo $gpu_util | awk '{{ print $5/$4 }}'`; fi) | tr " " ","
-        """)
-
-if args.report2:
-    if len(part_cpu) == 0:
-        print('No CPU partition found in the config file!')
-        sys.exit(1)
-
-    print('date,partition,total_corehour,allocation_corehour,utilization')
-    for c in part_cpu:
         tocpu = os.popen(f"sinfo --partition {c} --Node --format %C | cut --delimiter '/' --fields 4 | awk '{{ sum1 += $1 }} END {{ print sum1 }}'").read().strip()
-        data_ = os.popen(f"sacct --partition {c} --allusers --parsable2 --noheader --allocation --duplicates --format partition,start,end,ncpus --state CANCELLED,COMPLETED,FAILED,NODE_FAIL,PREEMPTED,TIMEOU --starttime $(date --date='1 day ago' +'%Y-%m-%d-%H:%M') --endtime  $(date +'%Y-%m-%d-%H:%M')").read().strip().split("\n")
-        if len(data_[0]) > 0:
-            tmcpu = []
-            for i in data_:
-                rw_ = i.split('|')
-                tm1 = time.strptime(rw_[1], '%Y-%m-%dT%H:%M:%S')
-                tm2 = time.strptime(rw_[2], '%Y-%m-%dT%H:%M:%S')
-                dif = time.mktime(tm2) - time.mktime(tm1) # running time per second
-                tmcpu.append(int(rw_[3]) * int(dif))
-        else:
-            tmcpu = [0]
-        print(time.strftime('%Y-%m-%d'), c, round(int(tocpu)*24), round(sum(tmcpu)/3600), round(sum(tmcpu)/(int(tocpu)*86400),2), sep = ',')
+        alcpu = os.popen(f"sinfo --partition {c} --Node --format %C | cut --delimiter '/' --fields 1 | awk '{{ sum1 += $1 }} END {{ print sum1 }}'").read().strip()
+        print(time.strftime('%Y-%m-%d'), c, "cpu", tocpu, alcpu, round(int(alcpu)/int(tocpu),2),sep = ',')
+        
+    for g in part_gpu:
+        togpu = os.popen(f"sinfo -p {g} -o %n,%G | grep -Po '(?<=:)\d' | awk '{{ sum1 += $1 }} END {{ print sum1 }}'").read().strip()
+        algpu = os.popen(f"squeue -O partition,gres,state | grep RUNNING | grep -i {g} | awk '{{ print $2 }}' | grep -Po '(?<=:)\d' | awk '{{ sum1 += $1 }} END {{ print sum1 }}'").read().strip()
+        if len(algpu) == 0:
+            algpu = 0
+        print(time.strftime('%Y-%m-%d'), g, "gpu", togpu, algpu, round(int(algpu)/int(togpu),2),sep = ',')

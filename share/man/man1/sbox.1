@@ -2,7 +2,7 @@
 .SH NAME
 sbox \- a simple toolbox for Slurm
 .SH SYNOPSIS
-sbox [-h] [-a] [-f] [-g] [-q] [-j JOBID] [-c] [-p] [-u UID] [-v] [--eff JOBID] [--history {day,week,month,year}] [--pending] [--running] [--cancel JOBID] [--qos] [--quota] [--ncpu] [--ngpu] [--gpu] [--license] [--reserve] [--topusage] [--whodat UID] [--whodat2 UNAME] [--agent {start,stop,list}] [--report] [--report2]
+sbox [-h] [-a] [-f] [-g] [-q] [-j JOBID] [-c] [-p] [-u UID] [-v] [--eff JOBID] [--history {day,week,month,year}] [--pending] [--running] [--cancel JOBID] [--qos] [--quota] [--ncpu] [--ngpu] [--gpu] [--license] [--reserve] [--topusage] [--whodat UID] [--whodat2 UNAME] [--agent {start,stop,list}] [--report]
 .br
 .SH DESCRIPTION
 .PP
@@ -147,12 +147,7 @@ key acceptances.
 .B --report
 Show current cluster utilization based on the
 running jobs.
-It uses slurm sinfo and squeue commands.
-.TP
-.B --report2
-Show cluster utilization based on ended jobs in
-last day.
-It uses Slurm sacct command.
+It uses Slurm sinfo and squeue commands.
 .PP
 Examples
 .PP
