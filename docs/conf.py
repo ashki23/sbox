@@ -59,10 +59,10 @@ html_theme = "sphinx_rtd_theme"
 
 ## For sphinx_rtd_theme
 html_theme_options = {
-    'logo_only': True,
+    #'logo_only': True,
     'navigation_depth': 3,
 }
-html_logo = "_static/logo.svg"
+#html_logo = "_static/logo.svg"
 html_show_sourcelink = True
 
 ## For alabaster theme 

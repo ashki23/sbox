@@ -1,9 +1,17 @@
 #!/bin/bash
+# =============================================================================
+# Author: Ashkan Mirzaee
+# Organization: University of Missouri RCSS
+# License: GPL-3.0
+# Date: 2021/07/09
+# Source: https://github.com/ashki23/sbox/docs
+# =============================================================================
 
 ## Run the file from _static directory (cd _static)
 
 ## Create an env for Sphinx and Pandoc
 #conda create -n sphinx -c conda-forge sphinx pandoc 
+
 source activate sphinx
 
 ## Build the local html for preview at ../_build/html/
